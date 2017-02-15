@@ -2,13 +2,13 @@ package com.stolets.rxdiffutil;
 
 import android.support.annotation.NonNull;
 
-public final class ExampleModel implements Identifiable<String> {
+public final class TestModel implements Identifiable<String> {
     @NonNull
     private final String mData;
     @NonNull
     private final String mId;
 
-    public ExampleModel(@NonNull final String data, @NonNull final String id) {
+    public TestModel(@NonNull final String data, @NonNull final String id) {
         this.mData = data;
         this.mId = id;
     }
@@ -29,7 +29,7 @@ public final class ExampleModel implements Identifiable<String> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ExampleModel that = (ExampleModel) o;
+        TestModel that = (TestModel) o;
 
         return mData.equals(that.mData);
     }
