@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     support_lib_version = '25.1.1'
+    dagger_version = '2.9'
 }
 
 android {
@@ -15,8 +16,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -30,7 +31,13 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:$support_lib_version"
     compile "com.android.support:recyclerview-v7:$support_lib_version"
-    compile 'io.reactivex.rxjava2:rxjava:2.0.5'
+
+    // RxJava
+    compile 'io.reactivex.rxjava2:rxjava:2.0.6'
+
+    // Dagger
+    compile "com.google.dagger:dagger:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
