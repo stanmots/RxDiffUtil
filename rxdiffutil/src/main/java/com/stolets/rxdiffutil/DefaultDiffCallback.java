@@ -2,7 +2,9 @@ package com.stolets.rxdiffutil;
 
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.RecyclerView;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
@@ -15,7 +17,9 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
  * @param <D> Comparable data type.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class DefaultDiffCallback<I, D extends Identifiable<I>> extends DiffUtil.Callback {
+public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends RecyclerView.Adapter & Updatable<D>> extends DiffUtil.Callback {
+    @NonNull
+    private WeakReference<A> mAdapterWeakRef;
     @NonNull
     private final List<? extends D> mOldData;
     @NonNull
@@ -26,13 +30,18 @@ public class DefaultDiffCallback<I, D extends Identifiable<I>> extends DiffUtil.
      *
      * @param oldData The current list with the data.
      * @param newData The updated list with the data which is compared with the oldData.
+     * @param adapter {@link RecyclerView.Adapter} that will be automatically updated and notified about the data changes. Note: the given adapter must implement {@link Updatable} interface.
      */
-    public DefaultDiffCallback(@NonNull final List<? extends D> oldData, @NonNull final List<? extends D> newData) {
+    public DefaultDiffCallback(@NonNull final List<? extends D> oldData,
+                               @NonNull final List<? extends D> newData,
+                               @NonNull final A adapter) {
         checkNotNull(oldData, "oldData must not be null!");
         checkNotNull(newData, "newData must not be null!");
+        checkNotNull(newData, "adapter must not be null!");
 
         this.mOldData = oldData;
         this.mNewData = newData;
+        this.mAdapterWeakRef = new WeakReference<>(adapter);
     }
 
     @Override
