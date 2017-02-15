@@ -1,8 +1,10 @@
 package com.stolets.rxdiffutil;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -18,12 +20,13 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends RecyclerView.Adapter & Updatable<D>> extends DiffUtil.Callback {
-    @NonNull
-    private WeakReference<A> mAdapterWeakRef;
+    private static final String TAG = "DefaultDiffCallback";
     @NonNull
     private final List<? extends D> mOldData;
     @NonNull
     private final List<? extends D> mNewData;
+    @NonNull
+    private WeakReference<A> mAdapterWeakRef;
 
     /**
      * Constructs an instance of {@link DefaultDiffCallback}.
@@ -62,5 +65,25 @@ public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends Recycle
     @Override
     public int getOldListSize() {
         return mOldData.size();
+    }
+
+    /**
+     * Updates data and visual representation of the adapter.
+     * @param diffResult The result of the difference calculation.
+     */
+    @UiThread
+    public void update(@NonNull final DiffUtil.DiffResult diffResult) {
+        checkNotNull(diffResult, "diffResult must not be null!");
+
+        final A adapter = mAdapterWeakRef.get();
+        if (adapter != null) {
+            // Update data
+            adapter.update(mNewData);
+
+            // Update visual representation
+            diffResult.dispatchUpdatesTo(adapter);
+        } else {
+            Log.w(TAG, "The adapter is null, diff result updates won't be dispatched");
+        }
     }
 }
