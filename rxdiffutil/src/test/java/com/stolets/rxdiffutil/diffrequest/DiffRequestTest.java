@@ -1,27 +1,26 @@
-package com.stolets.rxdiffutil;
+package com.stolets.rxdiffutil.diffrequest;
+
+import android.support.v7.util.DiffUtil;
+
+import com.stolets.rxdiffutil.BaseTest;
+import com.stolets.rxdiffutil.internal.Constants;
 
 import org.junit.Test;
 import org.mockito.Mock;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 public class DiffRequestTest extends BaseTest {
-    private final List<String> oldData = Arrays.asList("s1", "s2");
-    private final List<String> newData = Arrays.asList("s2", "s3");
-
     @Mock
-    private DataComparable<String> mDataComparable;
+    private DiffUtil.Callback mDataComparable;
 
     @Test
     public void it_ImplementsEquivalenceRelation() {
         // Given
-        final DiffRequest<String> diffRequest1 = new DiffRequest<>(mDataComparable, oldData, newData, true);
-        final DiffRequest<String> diffRequest2 = new DiffRequest<>(mDataComparable, oldData, newData, true);
+        final DiffRequest diffRequest1 = new DiffRequest(true, Constants.DIFF_REQUEST_DEFAULT_TAG, mDataComparable);
+        final DiffRequest diffRequest2 = new DiffRequest(true, Constants.DIFF_REQUEST_DEFAULT_TAG, mDataComparable);
 
         // When diffRequest1 is equal to diffRequest2
 
@@ -34,7 +33,7 @@ public class DiffRequestTest extends BaseTest {
         assertThat(diffRequest2, equalTo(diffRequest1));
 
         // transitive
-        final DiffRequest<String> diffRequest3 = new DiffRequest<>(mDataComparable, oldData, newData, true);
+        final DiffRequest diffRequest3 = new DiffRequest(true, Constants.DIFF_REQUEST_DEFAULT_TAG, mDataComparable);
         assertThat(diffRequest1.equals(diffRequest3), is(true));
         assertThat(diffRequest2.equals(diffRequest3), is(true));
         assertThat(diffRequest1.equals(diffRequest2), is(true));
