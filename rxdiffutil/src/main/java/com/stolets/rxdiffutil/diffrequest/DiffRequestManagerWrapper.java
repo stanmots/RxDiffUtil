@@ -8,6 +8,9 @@ import java.lang.ref.WeakReference;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
+/**
+ * This class is used as a wrapper around {@link DiffRequestManager} to prevent memory leaks.
+ */
 public final class DiffRequestManagerWrapper {
     @Nullable
     private WeakReference<DiffRequestManager> mDiffRequestManager;
