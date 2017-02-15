@@ -1,11 +1,18 @@
 package com.stolets.rxdiffutil;
 
+import android.support.v7.util.DiffUtil;
+
 import com.stolets.rxdiffutil.util.MockitoUtils;
 
 import org.junit.Test;
+import org.mockito.InOrder;
+
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 
 public class DefaultDiffCallbackTest {
     private final DefaultDiffCallback<String, TestModel, TestAdapter<TestModel>> callback = MockitoUtils.getStubbedDefaultDiffCallback();
@@ -40,5 +47,24 @@ public class DefaultDiffCallbackTest {
     public void testListSizes() {
         assertThat(callback.getOldListSize(), is(2));
         assertThat(callback.getNewListSize(), is(2));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void update_UpdatesAdapterData() {
+        // Given
+        final DiffUtil.DiffResult mockedDiffResult = mock(DiffUtil.DiffResult.class);
+        final List<TestModel> mockedData = mock(List.class);
+        final TestAdapter<TestModel> mockedAdapter = mock(TestAdapter.class);
+        final DefaultDiffCallback<String, TestModel, TestAdapter<TestModel>> mockedDefaultDiffCallback = new DefaultDiffCallback<>(mockedData, mockedData, mockedAdapter);
+
+        // When
+        mockedDefaultDiffCallback.update(mockedDiffResult);
+
+        // Then
+        final InOrder inOrder = inOrder(mockedAdapter, mockedDiffResult);
+
+        inOrder.verify(mockedAdapter).update(mockedData);
+        inOrder.verify(mockedDiffResult).dispatchUpdatesTo(mockedAdapter);
     }
 }
