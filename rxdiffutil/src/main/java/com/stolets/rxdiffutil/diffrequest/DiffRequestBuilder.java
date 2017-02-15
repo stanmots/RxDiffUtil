@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 
 import com.stolets.rxdiffutil.internal.Constants;
 
@@ -23,8 +22,6 @@ public final class DiffRequestBuilder {
     private DiffUtil.Callback mDiffCallback;
     @NonNull
     private String mTag = Constants.DIFF_REQUEST_DEFAULT_TAG;
-    @Nullable
-    private WeakReference<RecyclerView.Adapter> mAdapterWeakRef;
     private boolean mDetectMoves;
 
     /**
@@ -70,20 +67,6 @@ public final class DiffRequestBuilder {
     }
 
     /**
-     * Sets an adapter which will be automatically updated.
-     *
-     * @param adapter {@link android.support.v7.widget.RecyclerView.Adapter}.
-     * @return {@link DiffRequestBuilder}.
-     * @see {@link DiffRequest#setAdapter(RecyclerView.Adapter)}.
-     */
-    @NonNull
-    public DiffRequestBuilder adapter(@NonNull final RecyclerView.Adapter adapter) {
-        checkNotNull(adapter, "adapter must not be null!");
-        this.mAdapterWeakRef = new WeakReference<>(adapter);
-        return this;
-    }
-
-    /**
      * Builds the {@link DiffRequest} and returns {@link DiffRequestManagerWrapper} with the same tag and attached {@link DiffRequestManager}.
      * <p>
      * Note: If the given activity becomes null you won't be able to use the returned request manager to start diff calculations.
@@ -99,10 +82,6 @@ public final class DiffRequestBuilder {
         if (activity != null) {
             final DiffRequestManager diffRequestManager = DiffRequestManagerRetriever.retrieve(activity);
             final DiffRequest diffRequest = new DiffRequest(this.mDetectMoves, this.mTag, this.mDiffCallback);
-            final RecyclerView.Adapter adapter = mAdapterWeakRef != null ? mAdapterWeakRef.get() : null;
-            if (adapter != null) {
-                diffRequest.setAdapter(adapter);
-            }
 
             diffRequestManager.addPendingRequest(diffRequest);
             rxRequestManager.attachDiffRequestManager(diffRequestManager);
