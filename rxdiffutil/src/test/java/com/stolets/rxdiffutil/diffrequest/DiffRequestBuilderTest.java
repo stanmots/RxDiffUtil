@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.support.v7.util.DiffUtil;
 
 import com.stolets.rxdiffutil.BaseTest;
-import com.stolets.rxdiffutil.RxRequestManager;
 import com.stolets.rxdiffutil.util.MockitoUtils;
 
 import org.junit.Before;
@@ -74,7 +73,7 @@ public class DiffRequestBuilderTest extends BaseTest {
         given(mActivity.getFragmentManager()).willReturn(mFragmentManager);
 
         // When
-        final RxRequestManager rxRequestManager = mBuilder.build();
+        final DiffRequestManagerWrapper rxRequestManager = mBuilder.build();
 
         // Then
         assertThat(rxRequestManager.getTag(), is(TEST_TAG));

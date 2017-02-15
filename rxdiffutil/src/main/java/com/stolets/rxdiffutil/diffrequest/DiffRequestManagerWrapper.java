@@ -1,22 +1,20 @@
-package com.stolets.rxdiffutil;
+package com.stolets.rxdiffutil.diffrequest;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import com.stolets.rxdiffutil.diffrequest.DiffRequestManager;
 
 import java.lang.ref.WeakReference;
 
 import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
-public final class RxRequestManager {
+public final class DiffRequestManagerWrapper {
     @Nullable
     private WeakReference<DiffRequestManager> mDiffRequestManager;
     @NonNull
     private String mTag;
 
-    public RxRequestManager(@NonNull final String tag) {
+    public DiffRequestManagerWrapper(@NonNull final String tag) {
         checkNotNull(tag, "tag string must not be null!");
         checkArgument(!tag.isEmpty(), "tag string must not be empty!");
         this.mTag = tag;

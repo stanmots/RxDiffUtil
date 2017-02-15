@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 
-import com.stolets.rxdiffutil.RxRequestManager;
 import com.stolets.rxdiffutil.internal.Constants;
 
 import java.lang.ref.WeakReference;
@@ -85,17 +84,17 @@ public final class DiffRequestBuilder {
     }
 
     /**
-     * Builds the {@link DiffRequest} and returns {@link RxRequestManager} with the same tag and attached {@link DiffRequestManager}.
+     * Builds the {@link DiffRequest} and returns {@link DiffRequestManagerWrapper} with the same tag and attached {@link DiffRequestManager}.
      * <p>
      * Note: If the given activity becomes null you won't be able to use the returned request manager to start diff calculations.
      * </p>
      *
-     * @return {@link RxRequestManager}.
+     * @return {@link DiffRequestManagerWrapper}.
      */
     @NonNull
-    public RxRequestManager build() {
+    public DiffRequestManagerWrapper build() {
         final Activity activity = getActivity();
-        final RxRequestManager rxRequestManager = new RxRequestManager(this.mTag);
+        final DiffRequestManagerWrapper rxRequestManager = new DiffRequestManagerWrapper(this.mTag);
 
         if (activity != null) {
             final DiffRequestManager diffRequestManager = DiffRequestManagerRetriever.retrieve(activity);
