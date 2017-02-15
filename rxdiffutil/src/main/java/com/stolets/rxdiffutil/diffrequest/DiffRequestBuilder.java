@@ -77,17 +77,17 @@ public final class DiffRequestBuilder {
     @NonNull
     public DiffRequestManagerWrapper build() {
         final Activity activity = getActivity();
-        final DiffRequestManagerWrapper rxRequestManager = new DiffRequestManagerWrapper(this.mTag);
+        final DiffRequestManagerWrapper diffRequestManagerWrapper = new DiffRequestManagerWrapper(this.mTag);
 
         if (activity != null) {
             final DiffRequestManager diffRequestManager = DiffRequestManagerRetriever.retrieve(activity);
             final DiffRequest diffRequest = new DiffRequest(this.mDetectMoves, this.mTag, this.mDiffCallback);
 
             diffRequestManager.addPendingRequest(diffRequest);
-            rxRequestManager.attachDiffRequestManager(diffRequestManager);
+            diffRequestManagerWrapper.attachDiffRequestManager(diffRequestManager);
         }
 
-        return rxRequestManager;
+        return diffRequestManagerWrapper;
     }
 
     /**
