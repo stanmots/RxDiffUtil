@@ -23,7 +23,7 @@ public final class DiffRequestManager {
      * @param diffRequest A new {@link DiffRequest}.
      *                    Note: if a request with the same tag is already exists it will be replaced.
      */
-    public void addPendingRequest(@NonNull final DiffRequest diffRequest) {
+    void addPendingRequest(@NonNull final DiffRequest diffRequest) {
         checkNotNull(diffRequest, "diffRequest must not be null!");
         mPendingRequests.put(diffRequest.getTag(), diffRequest);
     }
@@ -32,7 +32,7 @@ public final class DiffRequestManager {
      * @return A map holding all pending requests. Note: the returned map is unmodifiable.
      */
     @NonNull
-    public Map<String, DiffRequest> getPendingRequests() {
+    Map<String, DiffRequest> getPendingRequests() {
         return Collections.unmodifiableMap(mPendingRequests);
     }
 }
