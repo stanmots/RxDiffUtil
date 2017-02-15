@@ -8,7 +8,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class DefaultDiffCallbackTest {
-    private final DefaultDiffCallback<String, TestModel, TestAdapter<TestModel>> callback = MockitoUtils.getMockedDefaultDiffCallback();
+    private final DefaultDiffCallback<String, TestModel, TestAdapter<TestModel>> callback = MockitoUtils.getStubbedDefaultDiffCallback();
 
     @Test
     public void areContentsTheSame_ComparesModelData() {

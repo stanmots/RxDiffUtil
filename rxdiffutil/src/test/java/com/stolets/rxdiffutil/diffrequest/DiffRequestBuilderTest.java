@@ -20,7 +20,7 @@ import static org.mockito.BDDMockito.given;
 
 public class DiffRequestBuilderTest extends BaseTest {
     private static final String TEST_TAG = "TEST_TAG";
-    private DiffUtil.Callback mCallback = MockitoUtils.getMockedDefaultDiffCallback();
+    private DiffUtil.Callback mCallback = MockitoUtils.getStubbedDefaultDiffCallback();
     private DiffRequestBuilder mBuilder;
 
     @Mock
