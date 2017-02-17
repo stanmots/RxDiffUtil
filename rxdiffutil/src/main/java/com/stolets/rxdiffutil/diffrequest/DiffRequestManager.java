@@ -23,7 +23,24 @@ public final class DiffRequestManager {
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     /**
+     * Returns a new {@link Single} that emits the {@link RxDiffResult}.
+     *
+     * @param diffRequest {@link DiffRequest} holding all parameters to start the difference calculation.
+     * @return {@link Single}.
+     */
+    private static Single<RxDiffResult> single(@NonNull final DiffRequest diffRequest) {
+        return Single.fromCallable(new Callable<RxDiffResult>() {
+            @Override
+            public RxDiffResult call() throws Exception {
+                final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffRequest.getDiffCallback(), diffRequest.isDetectingMoves());
+                return new RxDiffResult(diffRequest.getTag(), diffResult);
+            }
+        });
+    }
+
+    /**
      * Adds a new {@link DiffRequest} to the pending list.
+     *
      * @param diffRequest A new {@link DiffRequest}.
      *                    Note: if a request with the same tag is already exists it will be replaced.
      */
