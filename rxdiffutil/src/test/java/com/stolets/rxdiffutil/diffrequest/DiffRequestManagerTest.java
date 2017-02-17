@@ -7,21 +7,13 @@ import com.stolets.rxdiffutil.DefaultDiffCallback;
 import com.stolets.rxdiffutil.RxDiffResult;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import java.util.concurrent.Callable;
-
-import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.observers.TestObserver;
-import io.reactivex.plugins.RxJavaPlugins;
-import io.reactivex.schedulers.Schedulers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -32,18 +24,6 @@ import static org.mockito.Mockito.mock;
 public class DiffRequestManagerTest extends BaseTest {
     private static final String TEST_TAG = "TEST_TAG";
     private DiffRequestManager mDiffRequestManager;
-
-    @BeforeClass
-    public static void setupClass() {
-        RxJavaPlugins.onComputationScheduler(Schedulers.trampoline());
-
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler(new Function<Callable<Scheduler>, Scheduler>() {
-            @Override
-            public Scheduler apply(@NonNull Callable<Scheduler> schedulerCallable) throws Exception {
-                return Schedulers.trampoline();
-            }
-        });
-    }
 
     @Before
     public void setup() {
