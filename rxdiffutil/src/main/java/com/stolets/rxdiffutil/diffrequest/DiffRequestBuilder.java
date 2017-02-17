@@ -68,23 +68,21 @@ public final class DiffRequestBuilder {
 
     /**
      * Builds the {@link DiffRequest} and returns {@link DiffRequestManagerWrapper} with the same tag and attached {@link DiffRequestManager}.
-     * <p>
-     * Note: If the given activity becomes null you won't be able to use the returned request manager to start diff calculations.
-     * </p>
      *
-     * @return {@link DiffRequestManagerWrapper}.
+     * @return {@link DiffRequestManagerWrapper} or null if the given activity has been destroyed.
      */
-    @NonNull
+    @Nullable
+    @SuppressWarnings("WeakerAccess")
     public DiffRequestManagerWrapper build() {
         final Activity activity = getActivity();
-        final DiffRequestManagerWrapper diffRequestManagerWrapper = new DiffRequestManagerWrapper(this.mTag);
+        DiffRequestManagerWrapper diffRequestManagerWrapper = null;
 
         if (activity != null) {
             final DiffRequestManager diffRequestManager = DiffRequestManagerRetriever.retrieve(activity);
             final DiffRequest diffRequest = new DiffRequest(this.mDetectMoves, this.mTag, this.mDiffCallback);
 
             diffRequestManager.addPendingRequest(diffRequest);
-            diffRequestManagerWrapper.attachDiffRequestManager(diffRequestManager);
+            diffRequestManagerWrapper = new DiffRequestManagerWrapper(diffRequestManager, this.mTag);
         }
 
         return diffRequestManagerWrapper;
