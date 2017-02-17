@@ -29,6 +29,7 @@ dependencies {
 
     // RxJava
     compile 'io.reactivex.rxjava2:rxjava:2.0.6'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
     // Dagger
     compile "com.google.dagger:dagger:$dagger_version"
