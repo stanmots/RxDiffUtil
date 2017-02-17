@@ -19,6 +19,8 @@ public final class DiffRequestManager {
     private Map<String, DiffRequest> mPendingRequests = new HashMap<>();
     @NonNull
     private Map<String, Disposable> mCurrentSubscriptions = new HashMap<>();
+    @NonNull
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     /**
      * Adds a new {@link DiffRequest} to the pending list.
