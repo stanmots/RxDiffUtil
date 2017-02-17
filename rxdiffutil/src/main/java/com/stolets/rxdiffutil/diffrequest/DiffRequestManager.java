@@ -1,13 +1,28 @@
 package com.stolets.rxdiffutil.diffrequest;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
+import android.support.v7.util.DiffUtil;
+import android.util.Log;
 
+import com.stolets.rxdiffutil.DefaultDiffCallback;
+import com.stolets.rxdiffutil.RxDiffResult;
 import com.stolets.rxdiffutil.di.FragmentScope;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiConsumer;
+import io.reactivex.schedulers.Schedulers;
+
+import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
 /**
@@ -15,6 +30,7 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
  */
 @FragmentScope
 public final class DiffRequestManager {
+    private static final String TAG = "DiffRequestManager";
     @NonNull
     private Map<String, DiffRequest> mPendingRequests = new HashMap<>();
     @NonNull
@@ -50,6 +66,46 @@ public final class DiffRequestManager {
     }
 
     /**
+     * Starts the pending request which matches the given tag.
+     * If the request contains {@link DefaultDiffCallback} or its subclass the request will be handled automatically and null will be returned.
+     * Otherwise, the {@link Single} you can subscribe to is returned instead.
+     *
+     * @param tag {@link String} identifying the pending request.
+     * @return {@link Single} or null (if the request contains {@link DefaultDiffCallback} or if there is no pending request that matches the given tag).
+     */
+    @Nullable
+    Single<RxDiffResult> execute(@NonNull final String tag) {
+        checkNotNull(tag, "tag string must not be null!");
+        checkArgument(!tag.isEmpty(), "tag string must not be empty!");
+
+        final DiffRequest diffRequest = mPendingRequests.get(tag);
+        if (diffRequest == null) {
+            Log.w(TAG, "There is no pending request for the specified tag!");
+            return null;
+        }
+
+        // Remove the current subscription for the request with the same tag
+        dispose(tag);
+
+        Single<RxDiffResult> diffResultSingle = single(diffRequest);
+
+        // Check whether the single should be returned to the caller
+        if (diffRequest.getDiffCallback() instanceof DefaultDiffCallback) {
+            // DefaultDiffCallback indicates that we should subscribe here and return null
+            final DefaultDiffCallback defaultDiffCallback = (DefaultDiffCallback) diffRequest.getDiffCallback();
+            final Disposable disposable = diffResultSingle
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DiffResultSubscriber(defaultDiffCallback));
+
+            registerDisposable(disposable, diffRequest.getTag());
+
+            diffResultSingle = null;
+        }
+
+        return diffResultSingle;
+    }
+
     /**
      * Stores {@link Disposable} reference so that it can be retrieved later using the given tag.
      *
