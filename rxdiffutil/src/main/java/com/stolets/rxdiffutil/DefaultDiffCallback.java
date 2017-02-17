@@ -86,4 +86,20 @@ public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends Recycle
             Log.w(TAG, "The adapter is null, diff result updates won't be dispatched");
         }
     }
+
+    /**
+     * @return {@link List} with old data.
+     */
+    @NonNull
+    public List<? extends D> getOldData() {
+        return mOldData;
+    }
+
+    /**
+     * @return {@link List} with new data.
+     */
+    @NonNull
+    public List<? extends D> getNewData() {
+        return mNewData;
+    }
 }
