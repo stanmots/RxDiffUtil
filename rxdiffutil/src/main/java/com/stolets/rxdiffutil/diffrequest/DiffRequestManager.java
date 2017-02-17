@@ -51,6 +51,17 @@ public final class DiffRequestManager {
 
     /**
     /**
+     * Stores {@link Disposable} reference so that it can be retrieved later using the given tag.
+     *
+     * @param disposable {@link Disposable}
+     * @param tag        A {@link String} representing the tag the given disposable is associated with.
+     */
+    private void registerDisposable(@NonNull final Disposable disposable, @NonNull final String tag) {
+        mCompositeDisposable.add(disposable);
+        mCurrentSubscriptions.put(tag, disposable);
+    }
+
+    /**
      * Disposes the {@link Disposable} according to the given tag if the subscription is still in progress.
      *
      * @param tag A {@link String} identifying the diff request.
