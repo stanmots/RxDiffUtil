@@ -50,6 +50,22 @@ public final class DiffRequestManager {
     }
 
     /**
+    /**
+     * Disposes the {@link Disposable} according to the given tag if the subscription is still in progress.
+     *
+     * @param tag A {@link String} identifying the diff request.
+     */
+    private void dispose(@NonNull final String tag) {
+        final Disposable disposableForTag = mCurrentSubscriptions.get(tag);
+
+        // Check if the subscription is still in progress, if so then dispose the disposable
+        if (disposableForTag != null) {
+            mCompositeDisposable.remove(disposableForTag);
+            mCurrentSubscriptions.remove(tag);
+        }
+    }
+
+    /**
      * @return A map holding all pending requests. Note: the returned map is unmodifiable.
      */
     @NonNull
