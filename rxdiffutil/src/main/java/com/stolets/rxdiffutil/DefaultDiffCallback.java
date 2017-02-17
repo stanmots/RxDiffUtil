@@ -26,7 +26,7 @@ public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends Recycle
     @NonNull
     private final List<? extends D> mNewData;
     @NonNull
-    private WeakReference<A> mAdapterWeakRef;
+    private final WeakReference<A> mAdapterWeakRef;
 
     /**
      * Constructs an instance of {@link DefaultDiffCallback}.
