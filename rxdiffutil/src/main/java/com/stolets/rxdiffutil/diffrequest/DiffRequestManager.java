@@ -17,6 +17,8 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 public final class DiffRequestManager {
     @NonNull
     private Map<String, DiffRequest> mPendingRequests = new HashMap<>();
+    @NonNull
+    private Map<String, Disposable> mCurrentSubscriptions = new HashMap<>();
 
     /**
      * Adds a new {@link DiffRequest} to the pending list.
