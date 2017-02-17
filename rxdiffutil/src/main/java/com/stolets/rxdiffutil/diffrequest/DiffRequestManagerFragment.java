@@ -30,6 +30,12 @@ public class DiffRequestManagerFragment extends Fragment {
                 .inject(this);
     }
 
+    @Override
+    public void onDestroy() {
+        mDiffRequestManager.releaseResources();
+        super.onDestroy();
+    }
+
     /**
      * @return {@link DiffRequestManager} instance.
      */

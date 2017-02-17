@@ -107,6 +107,15 @@ public final class DiffRequestManager {
     }
 
     /**
+     * Clears all current pending requests and disposes all current subscriptions.
+     */
+    void releaseResources() {
+        mPendingRequests.clear();
+        mCurrentSubscriptions.clear();
+        mCompositeDisposable.clear();
+    }
+
+    /**
      * Stores {@link Disposable} reference so that it can be retrieved later using the given tag.
      *
      * @param disposable {@link Disposable}
