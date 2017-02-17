@@ -53,6 +53,7 @@ public final class DiffRequest {
     /**
      * @return True if DiffUtil should try to detect moved items, false otherwise.
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean isDetectingMoves() {
         return mDetectMoves;
     }
