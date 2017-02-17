@@ -83,4 +83,34 @@ public final class DiffRequestManager {
     Map<String, DiffRequest> getPendingRequests() {
         return Collections.unmodifiableMap(mPendingRequests);
     }
+
+    /**
+     * The class used to handle {@link RxDiffResult} obtained from {@link Single}.
+     */
+    private static final class DiffResultSubscriber implements BiConsumer<RxDiffResult, Throwable> {
+        @NonNull
+        private final DefaultDiffCallback mDefaultDiffCallback;
+
+        /**
+         * @param defaultDiffCallback {@link DefaultDiffCallback} instance or its subclass the {@link android.support.v7.util.DiffUtil.DiffResult} will be passed to.
+         */
+        DiffResultSubscriber(@NonNull final DefaultDiffCallback defaultDiffCallback) {
+            checkNotNull(defaultDiffCallback, "defaultDiffCallback must not be null!");
+            this.mDefaultDiffCallback = defaultDiffCallback;
+        }
+
+        @Override
+        @UiThread
+        public void accept(@io.reactivex.annotations.NonNull RxDiffResult rxDiffResult, @io.reactivex.annotations.NonNull Throwable throwable) throws Exception {
+            if (throwable != null && throwable.getMessage() != null) {
+                throw new IllegalStateException("Failed to calculate diff", throwable);
+            }
+
+            if (rxDiffResult == null) {
+                throw new IllegalStateException("rxDiffResult must not be null if the throwable is null too");
+            }
+
+            mDefaultDiffCallback.update(rxDiffResult.getDiffResult());
+        }
+    }
 }
