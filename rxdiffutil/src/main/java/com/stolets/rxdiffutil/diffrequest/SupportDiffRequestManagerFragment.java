@@ -19,15 +19,17 @@ public class SupportDiffRequestManagerFragment extends Fragment {
         return new SupportDiffRequestManagerFragment();
     }
 
+    public SupportDiffRequestManagerFragment() {
+        ((DiffRequestSubcomponent.Builder) DaggerUtils
+                .subcomponentBuilderFor(DiffRequestSubcomponent.Builder.class))
+                .build()
+                .inject(this);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-        ((DiffRequestSubcomponent.Builder) DaggerUtils
-                .subcomponentBuilderFor(DiffRequestSubcomponent.class))
-                .build()
-                .inject(this);
     }
 
     @Override
