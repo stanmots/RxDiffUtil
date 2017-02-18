@@ -41,7 +41,7 @@ public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends Recycle
                                @NonNull final A adapter) {
         checkNotNull(oldData, "oldData must not be null!");
         checkNotNull(newData, "newData must not be null!");
-        checkNotNull(newData, "adapter must not be null!");
+        checkNotNull(adapter, "adapter must not be null!");
 
         this.mOldData = oldData;
         this.mNewData = newData;
