@@ -23,7 +23,7 @@ public class RxDiffUtilTest extends BaseTest {
         // Given an activity and a callback
 
         // When
-        final DiffRequestBuilder builder = RxDiffUtil.builder(mActivity, mCallback);
+        final DiffRequestBuilder builder = RxDiffUtil.with(mCallback);
 
         // Then
         assertThat(builder, notNullValue());
