@@ -2,12 +2,9 @@ package com.stolets.rxdiffutil.diffrequest;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
 import com.stolets.rxdiffutil.internal.Constants;
-
-import java.lang.ref.WeakReference;
 
 import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
@@ -17,9 +14,7 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
  */
 public final class DiffRequestBuilder {
     @NonNull
-    private final WeakReference<Activity> mActivityWeakRef;
-    @NonNull
-    private DiffUtil.Callback mDiffCallback;
+    private final DiffUtil.Callback mDiffCallback;
     @NonNull
     private String mTag = Constants.DIFF_REQUEST_DEFAULT_TAG;
     private boolean mDetectMoves;
@@ -27,15 +22,12 @@ public final class DiffRequestBuilder {
     /**
      * Constructs a new {@link DiffRequestBuilder} instance.
      *
-     * @param activity The {@link Activity} that determines the lifecycle of the async calculations.
-     *                 When the activity is destroyed and finished (isFinishing = true) all current calculations are stopped automatically.
+     * @param diffCallback The concrete implementation of {@link DiffUtil.Callback}.
+     *                     You can pass {@link com.stolets.rxdiffutil.DefaultDiffCallback} to update {@link android.support.v7.widget.RecyclerView.Adapter} automatically.
      */
-    public DiffRequestBuilder(@NonNull final Activity activity, @NonNull final DiffUtil.Callback diffCallback) {
-        checkNotNull(activity, "activity must not be null!");
+    public DiffRequestBuilder(@NonNull final DiffUtil.Callback diffCallback) {
         checkNotNull(diffCallback, "diffCallback must not be null!");
 
-        // Required fields
-        this.mActivityWeakRef = new WeakReference<>(activity);
         this.mDiffCallback = diffCallback;
     }
 
@@ -67,34 +59,23 @@ public final class DiffRequestBuilder {
     }
 
     /**
-     * Builds the {@link DiffRequest} and returns {@link DiffRequestManagerWrapper} with the same tag and attached {@link DiffRequestManager}.
+     * Binds the constructed {@link DiffRequest} to the activity lifecycle.
      *
-     * @return {@link DiffRequestManagerWrapper} or null if the given activity has been destroyed.
+     * @param activity The {@link Activity} that determines the lifecycle of the background calculations.
+     *                 When the activity is destroyed and finished (isFinishing = true) all current calculations are cancelled automatically.
+     * @return {@link DiffRequestManagerWrapper} you can use to start the difference calculation.
      */
-    @Nullable
+    @NonNull
     @SuppressWarnings("WeakerAccess")
-    public DiffRequestManagerWrapper build() {
-        final Activity activity = getActivity();
-        DiffRequestManagerWrapper diffRequestManagerWrapper = null;
+    public DiffRequestManagerWrapper bindTo(@NonNull final Activity activity) {
+        checkNotNull(activity, "activity must not be null!");
 
-        if (activity != null) {
-            final DiffRequestManager diffRequestManager = DiffRequestManagerRetriever.retrieve(activity);
-            final DiffRequest diffRequest = new DiffRequest(this.mDetectMoves, this.mTag, this.mDiffCallback);
+        final DiffRequestManager diffRequestManager = DiffRequestManagerRetriever.retrieve(activity);
+        final DiffRequest diffRequest = new DiffRequest(this.mDetectMoves, this.mTag, this.mDiffCallback);
 
-            diffRequestManager.addPendingRequest(diffRequest);
-            diffRequestManagerWrapper = new DiffRequestManagerWrapper(diffRequestManager, this.mTag);
-        }
+        diffRequestManager.addPendingRequest(diffRequest);
 
-        return diffRequestManagerWrapper;
-    }
-
-    /**
-     * @return An {@link Activity} or null if it has been destroyed.
-     */
-    @Nullable
-    @SuppressWarnings("WeakerAccess")
-    public Activity getActivity() {
-        return mActivityWeakRef.get();
+        return new DiffRequestManagerWrapper(diffRequestManager, this.mTag);
     }
 
     /**
