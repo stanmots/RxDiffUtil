@@ -80,8 +80,7 @@ public final class DiffRequestManager {
 
         final DiffRequest diffRequest = mPendingRequests.get(tag);
         if (diffRequest == null) {
-            Log.w(TAG, "There is no pending request for the specified tag!");
-            return null;
+            throw new IllegalArgumentException("There is no pending request for the specified tag!");
         }
 
         // Remove pending request
