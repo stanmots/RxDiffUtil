@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">RxDiffUtilLib</string>
+    <string name="app_name">Demo</string>
+    <string name="restart_button_title">Restart</string>
 </resources>
