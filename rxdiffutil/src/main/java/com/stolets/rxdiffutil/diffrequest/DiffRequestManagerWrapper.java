@@ -1,41 +1,37 @@
 package com.stolets.rxdiffutil.diffrequest;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.stolets.rxdiffutil.RxDiffResult;
-
-import java.lang.ref.WeakReference;
 
 import io.reactivex.Single;
 
 import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
+
 /**
- * This class is used as a wrapper around {@link DiffRequestManager} to prevent memory leaks.
- * <p>
- * Note: The underlying {@link DiffRequestManager} will be GCd when the activity passed to {@link DiffRequestBuilder} is finished completely (not just due a configuration change).
- * </p>
+ * This class is used as a wrapper around {@link DiffRequestManager} to handle a request with the appropriate tag.
  */
 @SuppressWarnings("WeakerAccess")
 public final class DiffRequestManagerWrapper {
     @NonNull
-    private final WeakReference<DiffRequestManager> mDiffRequestManagerWeakRef;
+    private final DiffRequestManager mDiffRequestManager;
     @NonNull
     private final String mTag;
 
     /**
-     * Constructs a wrapper that holds a weak reference to {@link DiffRequestManager}.
+     * Constructs a wrapper around {@link DiffRequestManager}.
+     *
      * @param diffRequestManager {@link DiffRequestManager}.
-     * @param tag A tag that is passed to the underlying {@link DiffRequestManager} to handle the appropriate request.
+     * @param tag                A tag that is passed to the underlying {@link DiffRequestManager} to handle the appropriate request.
      */
     public DiffRequestManagerWrapper(@NonNull final DiffRequestManager diffRequestManager, @NonNull final String tag) {
         checkNotNull(diffRequestManager, "diffRequestManager must not be null!");
         checkNotNull(tag, "tag string must not be null!");
         checkArgument(!tag.isEmpty(), "tag string must not be empty!");
 
-        this.mDiffRequestManagerWeakRef = new WeakReference<>(diffRequestManager);
+        this.mDiffRequestManager = diffRequestManager;
         this.mTag = tag;
     }
 
