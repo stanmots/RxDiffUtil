@@ -23,7 +23,7 @@ public class TestAdapter<T> extends RecyclerView.Adapter<TestAdapter.TestViewHol
     }
 
     @Override
-    public void update(List<? extends T> newData) {
+    public void update(List<T> newData) {
 
     }
 
