@@ -3,7 +3,6 @@ package com.stolets.rxdiffutil.diffrequest;
 import android.support.v7.util.DiffUtil;
 
 import com.stolets.rxdiffutil.BaseTest;
-import com.stolets.rxdiffutil.DefaultDiffCallback;
 import com.stolets.rxdiffutil.RxDiffResult;
 
 import org.junit.Before;
@@ -18,20 +17,18 @@ import io.reactivex.observers.TestObserver;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.mock;
+
 
 public class DiffRequestManagerTest extends BaseTest {
     private static final String TEST_TAG = "TEST_TAG";
+    @Mock
+    DiffUtil.Callback mCallback;
     private DiffRequestManager mDiffRequestManager;
 
     @Before
     public void setup() {
         mDiffRequestManager = new DiffRequestManager();
     }
-
-    @Mock
-    DiffUtil.Callback mCallback;
 
     @Test
     public void addPendingRequest_AddsRequestToMap() {
@@ -47,7 +44,20 @@ public class DiffRequestManagerTest extends BaseTest {
     }
 
     @Test
-    public void execute_GiveDiffUtilCallback_ReturnsNull() {
+    public void execute_RemovesPendingRequest() {
+        // Given
+        final DiffRequest diffRequest = new DiffRequest(true, TEST_TAG, mCallback);
+        mDiffRequestManager.addPendingRequest(diffRequest);
+
+        // When
+        mDiffRequestManager.execute(TEST_TAG);
+
+        // Then
+        assertThat(mDiffRequestManager.getPendingRequests().size(), is(0));
+    }
+
+    @Test
+    public void execute_ReturnsSharedSingle() {
         // Given
         final DiffRequest diffRequest = new DiffRequest(true, TEST_TAG, mCallback);
         mDiffRequestManager.addPendingRequest(diffRequest);
@@ -59,7 +69,6 @@ public class DiffRequestManagerTest extends BaseTest {
         assertThat(single, notNullValue());
 
         final TestObserver<RxDiffResult> testObserver = new TestObserver<>();
-        assert single != null;
         single.subscribe(testObserver);
 
         testObserver.assertValue(new Predicate<RxDiffResult>() {
@@ -68,20 +77,5 @@ public class DiffRequestManagerTest extends BaseTest {
                 return rxDiffResult.getTag().equals(TEST_TAG);
             }
         });
-    }
-
-    @Test
-    public void execute_GivenDefaultDiffCallback_ReturnsSingle() {
-        // Given
-        final DefaultDiffCallback defaultDiffCallback = mock(DefaultDiffCallback.class);
-        final DiffRequest diffRequest = new DiffRequest(true, TEST_TAG, defaultDiffCallback);
-
-        mDiffRequestManager.addPendingRequest(diffRequest);
-
-        // When
-        final Single<RxDiffResult> single = mDiffRequestManager.execute(TEST_TAG);
-
-        // Then
-        assertThat(single, nullValue());
     }
 }
