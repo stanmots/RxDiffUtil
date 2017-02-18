@@ -20,7 +20,7 @@ import static org.mockito.BDDMockito.given;
 
 public class DiffRequestBuilderTest extends BaseTest {
     private static final String TEST_TAG = "TEST_TAG";
-    private DiffUtil.Callback mCallback = MockitoUtils.getStubbedDefaultDiffCallback();
+    private final DiffUtil.Callback mCallback = MockitoUtils.getStubbedDefaultDiffCallback();
     private DiffRequestBuilder mBuilder;
 
     @Mock
@@ -37,7 +37,7 @@ public class DiffRequestBuilderTest extends BaseTest {
 
     @Before
     public void setup() {
-        mBuilder = new DiffRequestBuilder(mActivity, mCallback);
+        mBuilder = new DiffRequestBuilder(mCallback);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class DiffRequestBuilderTest extends BaseTest {
         given(mActivity.getFragmentManager()).willReturn(mFragmentManager);
 
         // When
-        final DiffRequestManagerWrapper rxRequestManager = mBuilder.build();
+        final DiffRequestManagerWrapper rxRequestManager = mBuilder.bindTo(mActivity);
 
         // Then
         assertThat(rxRequestManager.getTag(), is(TEST_TAG));
