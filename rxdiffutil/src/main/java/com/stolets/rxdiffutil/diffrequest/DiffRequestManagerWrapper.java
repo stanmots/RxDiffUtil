@@ -38,12 +38,11 @@ public final class DiffRequestManagerWrapper {
     /**
      * Starts the difference calculation in accordance with parameters specified in {@link DiffRequestBuilder}.
      *
-     * @return {@link Single} you can subscribe to or null if the activity has been finished. It also returns null if you have passed {@link com.stolets.rxdiffutil.DefaultDiffCallback} to the builder, in this case the result is handled internally automatically.
+     * @return {@link Single} you can subscribe to.
      */
-    @Nullable
+    @NonNull
     public Single<RxDiffResult> calculate() {
-        final DiffRequestManager diffRequestManager = mDiffRequestManagerWeakRef.get();
-        return diffRequestManager != null ? diffRequestManager.execute(mTag) : null;
+        return mDiffRequestManager.execute(mTag);
     }
 
     /**
