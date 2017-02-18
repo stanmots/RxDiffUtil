@@ -34,7 +34,7 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public interface Updatable<U> {
     /**
-     * Updates the list with the old data.
+     * Updates the list containing the old data.
      *
      * @param newData {@link List} with the new data which will replace the old data.
      */
