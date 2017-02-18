@@ -1,10 +1,8 @@
 package com.stolets.rxdiffutil.diffrequest;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v7.util.DiffUtil;
-import android.util.Log;
 
 import com.stolets.rxdiffutil.DefaultDiffCallback;
 import com.stolets.rxdiffutil.RxDiffResult;
@@ -30,7 +28,6 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
  */
 @FragmentScope
 public final class DiffRequestManager {
-    private static final String TAG = "DiffRequestManager";
     @NonNull
     private Map<String, DiffRequest> mPendingRequests = new HashMap<>();
     @NonNull
@@ -67,13 +64,12 @@ public final class DiffRequestManager {
 
     /**
      * Starts the pending request which matches the given tag.
-     * If the request contains {@link DefaultDiffCallback} or its subclass the request will be handled automatically and null will be returned.
-     * Otherwise, the {@link Single} you can subscribe to is returned instead.
+     * If the request contains {@link DefaultDiffCallback} or its subclass the request will be handled automatically.
      *
      * @param tag {@link String} identifying the pending request.
-     * @return {@link Single} or null (if the request contains {@link DefaultDiffCallback} or if there is no pending request that matches the given tag).
+     * @return {@link Single}.
      */
-    @Nullable
+    @NonNull
     Single<RxDiffResult> execute(@NonNull final String tag) {
         checkNotNull(tag, "tag string must not be null!");
         checkArgument(!tag.isEmpty(), "tag string must not be empty!");
@@ -89,11 +85,10 @@ public final class DiffRequestManager {
         // Remove the current subscription for the request with the same tag
         dispose(tag);
 
-        Single<RxDiffResult> diffResultSingle = single(diffRequest);
+        final Single<RxDiffResult> diffResultSingle = single(diffRequest).cache();
 
-        // Check whether the single should be returned to the caller
+        // Check whether we should subscribe to the single here
         if (diffRequest.getDiffCallback() instanceof DefaultDiffCallback) {
-            // DefaultDiffCallback indicates that we should subscribe here and return null
             final DefaultDiffCallback defaultDiffCallback = (DefaultDiffCallback) diffRequest.getDiffCallback();
             final Disposable disposable = diffResultSingle
                     .subscribeOn(Schedulers.computation())
@@ -101,8 +96,6 @@ public final class DiffRequestManager {
                     .subscribe(new DiffResultSubscriber(defaultDiffCallback));
 
             registerDisposable(disposable, diffRequest.getTag());
-
-            diffResultSingle = null;
         }
 
         return diffResultSingle;
@@ -138,8 +131,8 @@ public final class DiffRequestManager {
 
         // Check if the subscription is still in progress, if so then dispose the disposable
         if (disposableForTag != null) {
-            mCompositeDisposable.remove(disposableForTag);
             mCurrentSubscriptions.remove(tag);
+            mCompositeDisposable.remove(disposableForTag);
         }
     }
 
