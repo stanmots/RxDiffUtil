@@ -84,6 +84,9 @@ public final class DiffRequestManager {
             return null;
         }
 
+        // Remove pending request
+        mPendingRequests.remove(tag);
+
         // Remove the current subscription for the request with the same tag
         dispose(tag);
 
