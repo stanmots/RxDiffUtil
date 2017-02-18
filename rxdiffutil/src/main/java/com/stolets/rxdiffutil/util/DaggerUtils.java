@@ -10,6 +10,7 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 public final class DaggerUtils {
     /**
      * Retrieves the subcomponent builder according to the given class.
+     *
      * @param builderClass {@link Class} of the subcomponent builder.
      * @return {@link SubcomponentBuilder}.
      */
@@ -17,7 +18,7 @@ public final class DaggerUtils {
     public static SubcomponentBuilder<?> subcomponentBuilderFor(@NonNull final Class<?> builderClass) {
         checkNotNull(builderClass, "builderClass must not be null!");
 
-       return DaggerRootHolder.getInstance()
+        return DaggerRootHolder.getInstance()
                 .getRootComponent()
                 .subcomponentBuilders()
                 .get(builderClass)
