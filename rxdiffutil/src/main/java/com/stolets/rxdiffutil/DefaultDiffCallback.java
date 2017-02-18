@@ -92,15 +92,15 @@ public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends Recycle
      * @return {@link List} with old data.
      */
     @NonNull
-    public List<? extends D> getOldData() {
-        return mOldData;
+    public List<D> getOldData() {
+        return Collections.unmodifiableList(mOldData);
     }
 
     /**
      * @return {@link List} with new data.
      */
     @NonNull
-    public List<? extends D> getNewData() {
-        return mNewData;
+    public List<D> getNewData() {
+        return Collections.unmodifiableList(mNewData);
     }
 }
