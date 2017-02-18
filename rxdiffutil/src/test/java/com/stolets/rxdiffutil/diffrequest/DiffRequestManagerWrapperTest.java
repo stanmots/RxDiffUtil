@@ -1,7 +1,5 @@
 package com.stolets.rxdiffutil.diffrequest;
 
-import android.support.v7.util.DiffUtil;
-
 import com.stolets.rxdiffutil.BaseTest;
 import com.stolets.rxdiffutil.DefaultDiffCallback;
 import com.stolets.rxdiffutil.RxDiffResult;
@@ -11,12 +9,16 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import io.reactivex.Single;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.TestObserver;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+
 
 public class DiffRequestManagerWrapperTest extends BaseTest {
     private static final String TEST_TAG = "TEST_TAG";
@@ -31,10 +33,10 @@ public class DiffRequestManagerWrapperTest extends BaseTest {
     }
 
     @Test
-    public void calculate_WhenDefaultDiffCallbackSet_ReturnsNull() {
+    public void calculate_ReturnsSharedSingle() {
         // Given
-        final DiffRequest diffRequest = new DiffRequest(true, TEST_TAG, mDefaultDiffCallback);
-        mDiffRequestManager.addPendingRequest(diffRequest);
+        final DiffRequest spyRequest = spy(new DiffRequest(true, TEST_TAG, mDefaultDiffCallback));
+        mDiffRequestManager.addPendingRequest(spyRequest);
 
         final DiffRequestManagerWrapper diffRequestManagerWrapper = new DiffRequestManagerWrapper(mDiffRequestManager, TEST_TAG);
 
@@ -42,27 +44,19 @@ public class DiffRequestManagerWrapperTest extends BaseTest {
         final Single<RxDiffResult> single = diffRequestManagerWrapper.calculate();
 
         // Then
-        assertThat(single, nullValue());
-    }
-
-    @Test
-    public void calculate_WhenDefaultDiffCallbackNotSet_ReturnsSingle() {
-        // Given
-        final DiffUtil.Callback callback = mock(DiffUtil.Callback.class);
-        final DiffRequest diffRequest = new DiffRequest(true, TEST_TAG, callback);
-        mDiffRequestManager.addPendingRequest(diffRequest);
-
-        final DiffRequestManagerWrapper diffRequestManagerWrapper = new DiffRequestManagerWrapper(mDiffRequestManager, TEST_TAG);
-
-        // When
-        final Single<RxDiffResult> single = diffRequestManagerWrapper.calculate();
-
         assertThat(single, notNullValue());
 
-        final TestObserver<RxDiffResult> testObserver = new TestObserver<>();
-        assert single != null;
-        single.subscribe(testObserver);
-
-        testObserver.assertNoErrors();
+        for(int i = 0; i < 5; ++i) {
+            final TestObserver<RxDiffResult> testObserver = new TestObserver<>();
+            single.subscribe(testObserver);
+            testObserver.assertNoErrors();
+            testObserver.assertValue(new Predicate<RxDiffResult>() {
+                @Override
+                public boolean test(@NonNull RxDiffResult rxDiffResult) throws Exception {
+                    return rxDiffResult.getTag().equals(TEST_TAG);
+                }
+            });
+            then(spyRequest).should(times(1)).isDetectingMoves();
+        }
     }
 }
