@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.List;
 
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
@@ -22,9 +23,9 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends RecyclerView.Adapter & Updatable<D>> extends DiffUtil.Callback {
     private static final String TAG = "DefaultDiffCallback";
     @NonNull
-    private final List<? extends D> mOldData;
+    private final List<D> mOldData;
     @NonNull
-    private final List<? extends D> mNewData;
+    private final List<D> mNewData;
     @NonNull
     private final WeakReference<A> mAdapterWeakRef;
 
@@ -35,8 +36,8 @@ public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends Recycle
      * @param newData The updated list with the data which is compared with the oldData.
      * @param adapter {@link RecyclerView.Adapter} that will be automatically updated and notified about the data changes. Note: the given adapter must implement {@link Updatable} interface.
      */
-    public DefaultDiffCallback(@NonNull final List<? extends D> oldData,
-                               @NonNull final List<? extends D> newData,
+    public DefaultDiffCallback(@NonNull final List<D> oldData,
+                               @NonNull final List<D> newData,
                                @NonNull final A adapter) {
         checkNotNull(oldData, "oldData must not be null!");
         checkNotNull(newData, "newData must not be null!");

@@ -14,5 +14,5 @@ public interface Updatable<U> {
      *
      * @param newData {@link List} with the new data which will replace the old data.
      */
-    void update(List<? extends U> newData);
+    void update(List<U> newData);
 }
