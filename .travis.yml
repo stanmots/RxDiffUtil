@@ -4,7 +4,6 @@ jdk:
   - oraclejdk8
 
 android:
-  update_sdk: true
   components:
     # Use the latest revision of Android SDK Tools
     - tools
@@ -28,7 +27,10 @@ before_script:
 
 script:
   - echo "Travis branch is $TRAVIS_BRANCH"
-  - ./gradlew test
+  - ./gradlew build jacocoTestReport
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

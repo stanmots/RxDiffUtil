@@ -23,6 +23,7 @@
  */
 
 apply plugin: 'com.android.library'
+apply plugin: 'jacoco-android'
 
 ext {
     support_lib_version = '25.1.1'
