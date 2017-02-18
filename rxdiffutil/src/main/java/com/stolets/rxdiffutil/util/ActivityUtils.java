@@ -32,7 +32,7 @@ public final class ActivityUtils {
     }
 
     /**
-     * Retrieves the fragemnt with the given tag. If not exists then a new fragment will be created.
+     * Retrieves the fragment with the given tag. If not exists then a new fragment will be created.
      *
      * @param fragmentManager The fragment manager used to find fragment.
      * @param tag Fragment tag.
