@@ -26,28 +26,22 @@ package com.stolets.rxdiffutil.diffrequest;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.stolets.rxdiffutil.util.DaggerUtils;
+import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
-import javax.inject.Inject;
 
 /**
  * The view-less retained fragment that is used to hold {@link DiffRequestManager}.
  */
 public class DiffRequestManagerFragment extends Fragment {
-    @Inject
-    DiffRequestManager mDiffRequestManager;
+    private DiffRequestManager mDiffRequestManager;
 
-    public static DiffRequestManagerFragment newInstance() {
-        return new DiffRequestManagerFragment();
-    }
-
-    public DiffRequestManagerFragment() {
-        ((DiffRequestSubcomponent.Builder) DaggerUtils
-                .subcomponentBuilderFor(DiffRequestSubcomponent.Builder.class))
-                .build()
-                .inject(this);
+    public static DiffRequestManagerFragment newInstance(@NonNull final DiffRequestManager diffRequestManager) {
+        final DiffRequestManagerFragment diffRequestManagerFragment = new DiffRequestManagerFragment();
+        diffRequestManagerFragment.setDiffRequestManager(diffRequestManager);
+        return diffRequestManagerFragment;
     }
 
     @Override
@@ -65,7 +59,18 @@ public class DiffRequestManagerFragment extends Fragment {
     /**
      * @return {@link DiffRequestManager} instance.
      */
+    @NonNull
     public DiffRequestManager getDiffRequestManager() {
         return mDiffRequestManager;
+    }
+
+    /**
+     * Used to inject {@link DiffRequestManager}.
+     *
+     * @param diffRequestManager {@link DiffRequestManager}.
+     */
+    public void setDiffRequestManager(@NonNull final DiffRequestManager diffRequestManager) {
+        checkNotNull(diffRequestManager, "diffRequestManager must not be null!");
+        this.mDiffRequestManager = diffRequestManager;
     }
 }

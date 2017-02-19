@@ -27,7 +27,6 @@ apply plugin: 'jacoco-android'
 
 ext {
     support_lib_version = '25.1.1'
-    dagger_version = '2.9'
 }
 
 android {
@@ -55,10 +54,6 @@ dependencies {
     // RxJava
     compile 'io.reactivex.rxjava2:rxjava:2.0.6'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-
-    // Dagger
-    compile "com.google.dagger:dagger:$dagger_version"
-    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'

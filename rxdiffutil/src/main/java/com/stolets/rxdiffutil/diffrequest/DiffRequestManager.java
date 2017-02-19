@@ -30,7 +30,6 @@ import android.support.v7.util.DiffUtil;
 
 import com.stolets.rxdiffutil.DefaultDiffCallback;
 import com.stolets.rxdiffutil.RxDiffResult;
-import com.stolets.rxdiffutil.di.FragmentScope;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,14 +49,42 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 /**
  * Manages the diff requests lifecycle.
  */
-@FragmentScope
 public final class DiffRequestManager {
     @NonNull
-    private Map<String, DiffRequest> mPendingRequests = new HashMap<>();
+    private final Map<String, DiffRequest> mPendingRequests;
     @NonNull
-    private Map<String, Disposable> mCurrentSubscriptions = new HashMap<>();
+    private final Map<String, Disposable> mCurrentSubscriptions;
     @NonNull
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable mCompositeDisposable;
+
+    /**
+     * Default constructor.
+     */
+    public DiffRequestManager() {
+        this.mPendingRequests = new HashMap<>();
+        this.mCurrentSubscriptions = new HashMap<>();
+        this.mCompositeDisposable = new CompositeDisposable();
+    }
+
+    /**
+     * Constructs a new instance of {@link DiffRequestManager} with injected parameters.
+     *
+     * @param requests            Inject concrete implementation of {@link Map} that holds pending requests.
+     * @param subscriptions       Inject concrete implementation of {@link Map} that holds current subscriptions.
+     * @param compositeDisposable Inject {@link CompositeDisposable}.
+     */
+    @SuppressWarnings("unused")
+    public DiffRequestManager(@NonNull final Map<String, DiffRequest> requests,
+                       @NonNull final Map<String, Disposable> subscriptions,
+                       @NonNull final CompositeDisposable compositeDisposable) {
+        checkNotNull(requests, "requests must not be null!");
+        checkNotNull(subscriptions, "subscriptions must not be null!");
+        checkNotNull(compositeDisposable, "compositeDisposable must not be null!");
+
+        this.mPendingRequests = requests;
+        this.mCurrentSubscriptions = subscriptions;
+        this.mCompositeDisposable = compositeDisposable;
+    }
 
     /**
      * Returns a new {@link Single} that emits the {@link RxDiffResult}.

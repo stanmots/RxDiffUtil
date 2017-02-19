@@ -29,6 +29,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.support.annotation.NonNull;
 
+import com.stolets.rxdiffutil.diffrequest.DiffRequestManager;
 import com.stolets.rxdiffutil.diffrequest.DiffRequestManagerFragment;
 
 import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
@@ -71,7 +72,7 @@ public final class ActivityUtils {
         Fragment fragment = fragmentManager.findFragmentByTag(tag);
 
         if (fragment == null) {
-            fragment = DiffRequestManagerFragment.newInstance();
+            fragment = DiffRequestManagerFragment.newInstance(new DiffRequestManager());
             addFragmentToActivity(fragmentManager, fragment, tag);
         }
 

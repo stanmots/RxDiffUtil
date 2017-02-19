@@ -25,29 +25,23 @@
 package com.stolets.rxdiffutil.diffrequest;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import com.stolets.rxdiffutil.util.DaggerUtils;
+import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
-import javax.inject.Inject;
 
 /**
  * The view-less retained fragment that is used to hold {@link DiffRequestManager}.
  */
 public class SupportDiffRequestManagerFragment extends Fragment {
-    @Inject
-    DiffRequestManager mDiffRequestManager;
+    private DiffRequestManager mDiffRequestManager;
 
-    public static SupportDiffRequestManagerFragment newInstance() {
-        return new SupportDiffRequestManagerFragment();
-    }
-
-    public SupportDiffRequestManagerFragment() {
-        ((DiffRequestSubcomponent.Builder) DaggerUtils
-                .subcomponentBuilderFor(DiffRequestSubcomponent.Builder.class))
-                .build()
-                .inject(this);
+    public static SupportDiffRequestManagerFragment newInstance(@NonNull final DiffRequestManager diffRequestManager) {
+        final SupportDiffRequestManagerFragment supportDiffRequestManagerFragment = new SupportDiffRequestManagerFragment();
+        supportDiffRequestManagerFragment.setDiffRequestManager(diffRequestManager);
+        return supportDiffRequestManagerFragment;
     }
 
     @Override
@@ -65,7 +59,18 @@ public class SupportDiffRequestManagerFragment extends Fragment {
     /**
      * @return {@link DiffRequestManager} instance.
      */
+    @NonNull
     public DiffRequestManager getDiffRequestManager() {
         return mDiffRequestManager;
+    }
+
+    /**
+     * Used to inject {@link DiffRequestManager}.
+     *
+     * @param diffRequestManager {@link DiffRequestManager}.
+     */
+    public void setDiffRequestManager(@NonNull final DiffRequestManager diffRequestManager) {
+        checkNotNull(diffRequestManager, "diffRequestManager must not be null!");
+        this.mDiffRequestManager = diffRequestManager;
     }
 }
