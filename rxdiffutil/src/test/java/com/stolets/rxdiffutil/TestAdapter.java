@@ -30,7 +30,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-public class TestAdapter<T> extends RecyclerView.Adapter<TestAdapter.TestViewHolder> implements Updatable<T> {
+public class TestAdapter<T> extends RecyclerView.Adapter<TestAdapter.TestViewHolder> implements Swappable<T> {
     @Override
     public TestAdapter.TestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new TestViewHolder(parent);
@@ -47,7 +47,7 @@ public class TestAdapter<T> extends RecyclerView.Adapter<TestAdapter.TestViewHol
     }
 
     @Override
-    public void update(List<T> newData) {
+    public void swapData(List<T> newData) {
 
     }
 

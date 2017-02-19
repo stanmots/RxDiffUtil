@@ -47,7 +47,7 @@ public final class DiffRequestBuilder {
      * Constructs a new {@link DiffRequestBuilder} instance.
      *
      * @param diffCallback The concrete implementation of {@link DiffUtil.Callback}.
-     *                     You can pass {@link com.stolets.rxdiffutil.DefaultDiffCallback} to update {@link android.support.v7.widget.RecyclerView.Adapter} automatically.
+     *                     You can pass {@link com.stolets.rxdiffutil.DefaultDiffCallback} to swapData {@link android.support.v7.widget.RecyclerView.Adapter} automatically.
      */
     public DiffRequestBuilder(@NonNull final DiffUtil.Callback diffCallback) {
         checkNotNull(diffCallback, "diffCallback must not be null!");

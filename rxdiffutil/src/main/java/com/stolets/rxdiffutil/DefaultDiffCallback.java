@@ -44,7 +44,7 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
  * @param <D> Comparable data type.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends RecyclerView.Adapter & Updatable<D>> extends DiffUtil.Callback {
+public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends RecyclerView.Adapter & Swappable<D>> extends DiffUtil.Callback {
     private static final String TAG = "DefaultDiffCallback";
     @NonNull
     private final List<D> mOldData;
@@ -58,7 +58,7 @@ public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends Recycle
      *
      * @param oldData The current list with the data.
      * @param newData The updated list with the data which is compared with the oldData.
-     * @param adapter {@link RecyclerView.Adapter} that will be automatically updated and notified about the data changes. Note: the given adapter must implement {@link Updatable} interface.
+     * @param adapter {@link RecyclerView.Adapter} that will be automatically updated and notified about the data changes. Note: the given adapter must implement {@link Swappable} interface.
      */
     public DefaultDiffCallback(@NonNull final List<D> oldData,
                                @NonNull final List<D> newData,
@@ -103,7 +103,7 @@ public class DefaultDiffCallback<I, D extends Identifiable<I>, A extends Recycle
         final A adapter = mAdapterWeakRef.get();
         if (adapter != null) {
             // Update data
-            adapter.update(mNewData);
+            adapter.swapData(mNewData);
 
             // Update visual representation
             diffResult.dispatchUpdatesTo(adapter);

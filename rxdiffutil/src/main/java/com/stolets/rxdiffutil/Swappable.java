@@ -27,16 +27,16 @@ package com.stolets.rxdiffutil;
 import java.util.List;
 
 /**
- * Defines the method used to update data managed by {@link android.support.v7.widget.RecyclerView.Adapter}.
+ * Defines the method used to swap data managed by {@link android.support.v7.widget.RecyclerView.Adapter}.
  *
  * @param <U> Data type.
  */
 @SuppressWarnings("WeakerAccess")
-public interface Updatable<U> {
+public interface Swappable<U> {
     /**
      * Updates the list containing the old data.
      *
      * @param newData {@link List} with the new data which will replace the old data.
      */
-    void update(List<U> newData);
+    void swapData(List<U> newData);
 }

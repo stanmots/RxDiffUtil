@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
         mSampleModelList.addAll(createInitialList());
 
-        mSampleAdapter.update(mSampleModelList);
+        mSampleAdapter.swapData(mSampleModelList);
         mSampleAdapter.notifyDataSetChanged();
     }
 

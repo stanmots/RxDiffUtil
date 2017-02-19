@@ -88,7 +88,7 @@ public class DefaultDiffCallbackTest {
         // Then
         final InOrder inOrder = inOrder(mockedAdapter, mockedDiffResult);
 
-        inOrder.verify(mockedAdapter).update(mockedData);
+        inOrder.verify(mockedAdapter).swapData(mockedData);
         inOrder.verify(mockedDiffResult).dispatchUpdatesTo(mockedAdapter);
     }
 }
