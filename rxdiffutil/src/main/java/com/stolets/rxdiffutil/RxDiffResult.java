@@ -31,7 +31,7 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
 /**
- * Hods the {@link android.support.v7.util.DiffUtil.DiffResult} identified by the tag.
+ * Holds the {@link android.support.v7.util.DiffUtil.DiffResult} identified by the tag.
  */
 public final class RxDiffResult {
     @NonNull
