@@ -30,7 +30,7 @@ import android.support.annotation.Nullable;
  * Static convenience methods that help a method or constructor check whether it was invoked
  * correctly.
  *
- * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java"</a>
+ * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java">link</a>
  */
 public final class Preconditions {
     private Preconditions() {}

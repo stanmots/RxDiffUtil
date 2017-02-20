@@ -82,6 +82,14 @@ android {
     }
 }
 
+// Fix javadoc task
+// see https://stackoverflow.com/questions/34571371/android-studio-javadoc-cannot-find-symbol
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompile.classpath.files
+    })
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
