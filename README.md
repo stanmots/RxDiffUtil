@@ -7,9 +7,9 @@ RxDiffUtil
 
 RxDiffUtil is a lightweight Rx wrapper around [DiffUtil](https://developer.android.com/reference/android/support/v7/util/DiffUtil.html) from Android support library.
 
-Under the hood it automates a lot of things, such as background processing of multiple [calculateDiff](https://developer.android.com/reference/android/support/v7/util/DiffUtil.html#calculateDiff) operations, binding to `Activity` lifecycle (`AppCompatActivity` is also supported), automatic `RecyclerView.Adapter` updating etc.
+Under the hood it automates a lot of things, such as background processing of multiple [calculateDiff][1] operations, binding to `Activity` lifecycle (`AppCompatActivity` is also supported), automatic `RecyclerView.Adapter` updating etc.
 
-You are not forced to use it with [RxJava](https://github.com/ReactiveX/RxJava) if you don't want to for some reason. It is possible to initiate diff requests with just one line of code even without subscribing. Really! :metal::tada:
+You do not need to be an expert of [RxJava](https://github.com/ReactiveX/RxJava). It is possible to initiate diff requests with just one line of code even without subscribing. Really! :metal::tada:
 
 ****
 
@@ -17,7 +17,7 @@ You are not forced to use it with [RxJava](https://github.com/ReactiveX/RxJava) 
 * minSdkVersion: 14
 
 ### What is this all about?
-Using `RecyclerView` (and `RecyclerView.Adapter` as a consequence) we often encouter situations when we need to make a lot of changes to the data source and then notify somehow our adapter in the most efficient way :chart_with_upwards_trend:
+Using `RecyclerView` (and `RecyclerView.Adapter` as a consequence) we often encounter situations when we need to make a lot of changes to the data source and then notify somehow our adapter in the most efficient way :chart_with_upwards_trend:.
 
 The Android developers can use the following methods to notify the adapter about the underlying model changes:
 
@@ -30,15 +30,15 @@ The Android developers can use the following methods to notify the adapter about
 
 _Note: check out [this](https://guides.codepath.com/android/using-the-recyclerview#overview) amazing tutorial to know more about RecyclerView configuration._
 
-Ok, cool. Imagine we have inserted a new item at the beginning of our model liss, we must then notify the adapter as follows:
+Ok, cool. Imagine we have inserted a new item at the beginning of our model list, we must then notify the adapter as follows:
 
 ```java
 // Notify the adapter that an item was inserted at position 0
 adapter.notifyItemInserted(0)
 ```
-And then we've removed some item in the middle. And then changed 50 scattered items. This becomes not cool very quicly :sweat:. Especially, taking into account that our lists can be pretty large.
+And then we've removed some item in the middle. And then changed 50 scattered items. This becomes not cool very quickly :sweat:. Especially taking into account that our lists can be pretty large.
 
-Of course, we could just call `notifyDataSetChanged()`.  However, it's **NOT** recommeded to do that. `notifyDataSetChanged()` eliminates the ability to perform animation sequences to showcase what changed.
+Of course, we could just call `notifyDataSetChanged()`.  However, it's **NOT** recommended to do that. `notifyDataSetChanged()` eliminates the ability to perform animation sequences to showcase what changed.
 
 Fortunately, `DiffUtil` comes here to our rescue. This tiny tool can be used to compute the difference between the old and new list and notify the adapter with one line of code:
 
@@ -47,9 +47,9 @@ Fortunately, `DiffUtil` comes here to our rescue. This tiny tool can be used to 
 diffResult.dispatchUpdatesTo(adapter);
 ```
 
-It seems that `DiffUtil` completely solves the problem of the efficient adpater updating. But, there is one catch. This helpful utility still involves some boilerplate code:
+It seems that `DiffUtil` completely solves the problem of the efficient adapter updating. But, there is one catch. This helpful utility still involves some boilerplate code:
 
-* Firstly, we msut implement a class that implements the `DiffUtil.Callback` required methods. And if we have multiple recycler views this step should be repeated.
+* Firstly, we must implement a class that implements the `DiffUtil.Callback` required methods. And if we have multiple recycler views this step should be repeated.
 
 * As stated in the documentation:
 
@@ -67,7 +67,7 @@ And here is the next tool that comes to our rescue: **RxDiffUtil**.
 ### Features
 
 * Provides Rx interface to `DiffUtil`
-* Automatically cancels all operations (unsubscribes all current subscribtions) when `Activity` has been destroyed and finished
+* Automatically cancels all operations (unsubscribes all current subscriptions) when `Activity` has been destroyed and finished
 * Subscriptions can be bound to both `android.app.Activity` and `android.support.v7.app.AppCompatActivity`
 * Automatically configures background threads
 * Automatically updates `RecyclerView.Adapter` on the main thread
@@ -92,9 +92,9 @@ RxDiffUtil.with(new DefaultDiffCallback<>(oldList, newList, adapter))
 There are just a couple of things to note here.
 
 * The lists that are passed to [DefaultDiffCallback](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/DefaultDiffCallback.java)
-must hold the data model which implements [Identifiable](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/Identifiable.java) interface. This interface is required to provide the proper unique identefiers of the compared items. [Here](https://github.com/storix/RxDiffUtil/blob/master/sample/src/main/java/com/stolets/rxdiffutillib/SampleModel.java#L25) is the sample implementation.
+must hold the data model which implements [Identifiable](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/Identifiable.java) interface. This interface is required to provide the proper unique identifiers of the compared items. [Here](https://github.com/storix/RxDiffUtil/blob/master/sample/src/main/java/com/stolets/rxdiffutillib/SampleModel.java#L25) is the sample implementation.
 
-* The adapter must implement [Swappable](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/Swappable.java) interface. This is required to update data source and notify adapter at the approriate time. [Here](https://github.com/storix/RxDiffUtil/blob/master/sample/src/main/java/com/stolets/rxdiffutillib/SampleAdapter.java#L60) is the sample implementation.
+* The adapter must implement [Swappable](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/Swappable.java) interface. This is required to update data source and notify adapter at the appropriate time. [Here](https://github.com/storix/RxDiffUtil/blob/master/sample/src/main/java/com/stolets/rxdiffutillib/SampleAdapter.java#L60) is the sample implementation.
 
 If you need to update just one `RecyclerView.Adapter` than that's it. You should not worry about anything: adapter is updated automatically; when `Activity` is finished all resources will be disposed; when you call `calculate()` the previous operation is cancelled automatically; the main thread won't be blocked.
 
@@ -148,6 +148,11 @@ RxDiffUtil.with(new DefaultDiffCallback<>(oldList, newList, adapter2))
           .calculate();
 ```
 
+### Thanks
+
+* [CodePath](https://codepath.com/about) team for the amazing Android tutorials.
+
+
 ### LICENSE
 
 MIT License
@@ -155,3 +160,5 @@ MIT License
 Copyright (c) 2017 Stan Mots (Storix)
 
 See the [LICENSE](https://github.com/storix/RxDiffUtil/blob/master/LICENSE) file for details.
+
+[1]: https://developer.android.com/reference/android/support/v7/util/DiffUtil.html#calculateDiff(android.support.v7.util.DiffUtil.Callback, boolean)
