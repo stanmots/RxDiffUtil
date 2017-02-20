@@ -27,9 +27,11 @@ apply plugin: 'jacoco-android'
 
 ext {
 
-    // Properties defined in local.properties
+    // Try to read properties defined in local.properties
     Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    if (project.rootProject.file('local.properties').exists()) {
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    }
 
     bintrayUser = System.getenv("BINTRAY_USER") ?: properties.getProperty("bintrayUser")
     bintrayApiKey = System.getenv("BINTRAY_KEY") ?: properties.getProperty("bintrayKey")
