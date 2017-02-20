@@ -26,7 +26,44 @@ apply plugin: 'com.android.library'
 apply plugin: 'jacoco-android'
 
 ext {
-    support_lib_version = '25.1.1'
+
+    // Properties defined in local.properties
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+    bintrayUser = System.getenv("BINTRAY_USER") ?: properties.getProperty("bintrayUser")
+    bintrayApiKey = System.getenv("BINTRAY_KEY") ?: properties.getProperty("bintrayKey")
+
+    sonatypeUsername = System.getenv("SONATYPE_USER") ?: properties.getProperty("sonatypeUser")
+    sonatypePassword = System.getenv("SONATYPE_PASSWORD") ?: properties.getProperty("sonatypePassword")
+    gpgPassphrase = System.getenv("GPG_PASSPHRASE") ?: properties.getProperty("gpgPassphrase")
+
+    bintrayRepo = 'maven-public'
+    bintrayName = 'rx-diff-util'
+
+    publishedGroupId = 'io.github.storix'
+    libraryName = 'RxDiffUtil'
+    artifact = 'rx-diff-util'
+
+    libraryDescription = 'A lightweight Rx wrapper around DiffUtil with Activity lifecycle support'
+
+    siteUrl = 'https://github.com/storix/RxDiffUtil'
+    gitUrl = 'https://github.com/storix/RxDiffUtil.git'
+    issueUrl = 'https://github.com/storix/RxDiffUtil/issues'
+    notesFile = 'README.md'
+
+    libraryVersion = '0.2.0'
+    libraryVcsTag = libraryVersion
+
+    developerId = 'Storix'
+    developerName = 'Stan Mots'
+    developerEmail = 'stuffokator@gmail.com'
+
+    licenseName = 'MIT License'
+    licenseUrl = 'http://www.opensource.org/licenses/mit-license.php'
+    allLicenses = ["MIT License"]
+
+    allLabels = ['Android', 'DiffUtil', 'RxJava']
 }
 
 android {
@@ -68,3 +105,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 }
+
+apply from: '../scripts/generatePom.gradle'
+apply from: '../scripts/configureBintray.gradle'
