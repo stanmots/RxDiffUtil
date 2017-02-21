@@ -84,6 +84,11 @@ android {
     }
 }
 
+jacocoAndroidUnitTestReport {
+    excludes += ['**/internal/Preconditions.*',
+                 '**/internal/Constants.*']
+}
+
 // Fix javadoc task
 // see https://stackoverflow.com/questions/34571371/android-studio-javadoc-cannot-find-symbol
 afterEvaluate {
