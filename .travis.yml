@@ -23,7 +23,8 @@ android:
 sudo: false
 
 before_script:
-  - chmod +x gradlew      # Grand permissions
+  - chmod +x scripts/publishToBintray.sh
+  - chmod +x gradlew
 
 script:
   - echo "Travis branch is $TRAVIS_BRANCH"
