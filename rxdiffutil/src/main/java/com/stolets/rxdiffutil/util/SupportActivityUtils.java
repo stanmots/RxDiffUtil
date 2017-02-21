@@ -41,7 +41,7 @@ public final class SupportActivityUtils {
      * performed by the {@code fragmentManager}.
      */
     @SuppressWarnings("WeakerAccess")
-    static void addSupportFragmentToActivity(@NonNull final FragmentManager fragmentManager,
+    public static void addSupportFragmentToActivity(@NonNull final FragmentManager fragmentManager,
                                              @NonNull final Fragment fragment,
                                              @NonNull final String tag) {
         checkNotNull(fragmentManager, "fragmentManager must not be null!");

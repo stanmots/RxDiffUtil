@@ -22,13 +22,10 @@
  * SOFTWARE.
  */
 
-package com.stolets.rxdiffutil.util;
-
-import android.app.Fragment;
-import android.app.FragmentManager;
+package com.stolets.rxdiffutil.diffrequest;
 
 import com.stolets.rxdiffutil.BaseRoboTest;
-import com.stolets.rxdiffutil.internal.Constants;
+import com.stolets.rxdiffutil.util.SupportActivityUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,43 +33,41 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import static com.stolets.rxdiffutil.util.MockitoUtils.TEST_TAG;
+import static com.stolets.rxdiffutil.util.MockitoUtils.getStubbedDiffRequestManager;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 @RunWith(RobolectricTestRunner.class)
-public class ActivityUtilsRoboTest extends BaseRoboTest {
-    private FragmentManager mFragmentManager;
-    private Fragment mFragment;
+public class SupportDiffRequestManagerFragmentTest extends BaseRoboTest {
+    private SupportDiffRequestManagerFragment mSupportDiffRequestManagerFragment;
 
     @Before
     public void setup() {
-        mFragment = new Fragment();
-        mFragmentManager = getActivity().getFragmentManager();
+        mSupportDiffRequestManagerFragment = SupportDiffRequestManagerFragment.newInstance(getStubbedDiffRequestManager());
     }
 
     @Test
-    public void addFragmentToActivity_AddsNewFragment() {
-        // Given a fragment and the fragment manager
+    public void newInstance_InjectsDiffFragmentManager() {
+        // Given mSupportDiffRequestManagerFragment
 
         // When
-        ActivityUtils.addFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
+        final DiffRequestManager diffRequestManager = mSupportDiffRequestManagerFragment.getDiffRequestManager();
 
         // Then
-        assertThat(mFragmentManager.findFragmentByTag(TEST_TAG), notNullValue());
+        assertThat(diffRequestManager, notNullValue());
+        assertThat(diffRequestManager.getPendingRequests().size(), is(1));
     }
 
     @Test
-    public void findOrCreateFragment_RetrievesRetainedFragment() {
-        // Given a fragment and the fragment manager
-
-        ActivityUtils.addFragmentToActivity(mFragmentManager, mFragment, Constants.RETAINED_FRAGMENT_TAG);
+    public void it_SurvivesConfigurationChange() {
+        // Given
+        SupportActivityUtils.addSupportFragmentToActivity(getActivity().getSupportFragmentManager(), mSupportDiffRequestManagerFragment, TEST_TAG);
 
         // When
-        Fragment retrievedFragment = ActivityUtils.findOrCreateFragment(mFragmentManager, Constants.RETAINED_FRAGMENT_TAG);
+        getActivity().recreate();
 
         // Then
-        assertThat(retrievedFragment, notNullValue());
-        assertThat(retrievedFragment.getTag(), is(Constants.RETAINED_FRAGMENT_TAG));
+        assertThat(getActivity().getSupportFragmentManager().findFragmentByTag(TEST_TAG), notNullValue());
     }
 }

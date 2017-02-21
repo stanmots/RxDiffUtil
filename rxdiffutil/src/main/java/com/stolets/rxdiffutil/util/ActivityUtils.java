@@ -39,11 +39,10 @@ public final class ActivityUtils {
     /**
      * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
      * performed by the {@code fragmentManager}.
-     *
      */
-    static void addFragmentToActivity (@NonNull final FragmentManager fragmentManager,
-                                                     @NonNull final Fragment fragment,
-                                                     @NonNull final String tag) {
+    public static void addFragmentToActivity(@NonNull final FragmentManager fragmentManager,
+                                      @NonNull final Fragment fragment,
+                                      @NonNull final String tag) {
         checkNotNull(fragmentManager, "fragmentManager must not be null!");
         checkNotNull(fragment, "fragment must not be null!");
         checkNotNull(tag, "tag must not be null!");
@@ -60,7 +59,7 @@ public final class ActivityUtils {
      * Retrieves the fragment with the given tag. If not exists then a new fragment will be created.
      *
      * @param fragmentManager The fragment manager used to find fragment.
-     * @param tag Fragment tag.
+     * @param tag             Fragment tag.
      * @return The retrieved retained fragment or a its new instance.
      */
     @NonNull
@@ -81,8 +80,9 @@ public final class ActivityUtils {
 
     /**
      * Removes the current fragment with the same tag if it exists to prevent duplicates.
+     *
      * @param fragmentManager A fragment manager which manages the fragment removal.
-     * @param tag A tag of the fragment that must be removed.
+     * @param tag             A tag of the fragment that must be removed.
      */
     private static void removeCurrentFragment(@NonNull final FragmentManager fragmentManager,
                                               @NonNull final String tag) {
