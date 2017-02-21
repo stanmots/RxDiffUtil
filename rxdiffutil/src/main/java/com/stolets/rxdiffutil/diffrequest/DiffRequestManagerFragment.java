@@ -48,6 +48,11 @@ public class DiffRequestManagerFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        // If the process was killed
+        if (mDiffRequestManager == null) {
+            mDiffRequestManager = new DiffRequestManager();
+        }
     }
 
     @Override
