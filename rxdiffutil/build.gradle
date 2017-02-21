@@ -42,6 +42,7 @@ ext {
 
     bintrayRepo = 'maven-public'
     bintrayName = 'rx-diff-util'
+    bintrayOrg = 'stolets'
 
     publishedGroupId = 'io.github.storix'
     libraryName = 'RxDiffUtil'
