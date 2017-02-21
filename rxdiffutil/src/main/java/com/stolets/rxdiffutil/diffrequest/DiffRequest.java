@@ -38,7 +38,7 @@ public final class DiffRequest {
     private final DiffUtil.Callback mDiffCallback;
     @NonNull
     private final String mTag;
-    private boolean mDetectMoves;
+    private final boolean mDetectMoves;
 
     /**
      * Constructs a new instance of {@link DiffRequest}.
