@@ -39,10 +39,14 @@ public final class ActivityUtils {
     /**
      * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
      * performed by the {@code fragmentManager}.
+     *
+     * @param fragmentManager {@link FragmentManager} associated with {@link android.app.Activity}.
+     * @param fragment        {@link Fragment} to add.
+     * @param tag             A string identifying the fragment.
      */
     public static void addFragmentToActivity(@NonNull final FragmentManager fragmentManager,
-                                      @NonNull final Fragment fragment,
-                                      @NonNull final String tag) {
+                                             @NonNull final Fragment fragment,
+                                             @NonNull final String tag) {
         checkNotNull(fragmentManager, "fragmentManager must not be null!");
         checkNotNull(fragment, "fragment must not be null!");
         checkNotNull(tag, "tag must not be null!");
