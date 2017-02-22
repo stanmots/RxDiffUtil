@@ -45,8 +45,8 @@ ext {
     bintrayOrg = 'stolets'
 
     publishedGroupId = 'io.github.storix'
-    libraryName = 'RxDiffUtil'
-    artifact = 'rx-diff-util'
+    libraryName = 'rxdiffutil'
+    artifact = 'rxdiffutil'
 
     libraryDescription = 'A lightweight Rx wrapper around DiffUtil with Activity lifecycle support'
 
