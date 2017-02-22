@@ -73,6 +73,9 @@ public class DiffRequestManagerWrapperTest extends BaseTest {
         for(int i = 0; i < 5; ++i) {
             final TestObserver<RxDiffResult> testObserver = new TestObserver<>();
             single.subscribe(testObserver);
+
+            testObserver.awaitTerminalEvent();
+
             testObserver.assertNoErrors();
             testObserver.assertValue(new Predicate<RxDiffResult>() {
                 @Override

@@ -95,6 +95,8 @@ public class DiffRequestManagerTest extends BaseTest {
         final TestObserver<RxDiffResult> testObserver = new TestObserver<>();
         single.subscribe(testObserver);
 
+        testObserver.awaitTerminalEvent();
+
         testObserver.assertValue(new Predicate<RxDiffResult>() {
             @Override
             public boolean test(@NonNull RxDiffResult rxDiffResult) throws Exception {
