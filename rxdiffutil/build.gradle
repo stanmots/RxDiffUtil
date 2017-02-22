@@ -40,9 +40,8 @@ ext {
     sonatypePassword = (System.getenv("SONATYPE_PASSWORD") ?: properties.getProperty("sonatypePassword")) ?: ""
     gpgPassphrase = (System.getenv("GPG_PASSPHRASE") ?: properties.getProperty("gpgPassphrase")) ?: ""
 
-    bintrayRepo = 'maven-public'
-    bintrayName = 'rx-diff-util'
-    bintrayOrg = 'stolets'
+    bintrayRepo = 'maven'
+    bintrayName = 'rxdiffutil'
 
     publishedGroupId = 'io.github.storix'
     libraryName = 'rxdiffutil'

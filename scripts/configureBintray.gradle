@@ -61,7 +61,6 @@ bintray {
     pkg {
         repo = bintrayRepo
         name = bintrayName
-        userOrg = bintrayOrg
         desc = libraryDescription
         websiteUrl = siteUrl
         issueTrackerUrl = issueUrl
@@ -86,8 +85,7 @@ bintray {
                 //[Default: true] Determines whether to sync the version to Maven Central.
                 user = sonatypeUsername // OSS user token: mandatory
                 password = sonatypePassword // OSS user password: mandatory
-                close = '1'
-                //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+                close = '1' // Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by putting 0 as value) and release the version manually.
             }
         }
     }
