@@ -37,6 +37,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Predicate;
 import io.reactivex.observers.TestObserver;
 
+import static com.stolets.rxdiffutil.util.MockitoUtils.TEST_TAG;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.BDDMockito.then;
@@ -45,7 +46,6 @@ import static org.mockito.Mockito.times;
 
 
 public class DiffRequestManagerWrapperTest extends BaseTest {
-    private static final String TEST_TAG = "TEST_TAG";
     private DiffRequestManager mDiffRequestManager;
 
     @Mock
