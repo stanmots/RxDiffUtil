@@ -4,17 +4,46 @@ RxDiffUtil
 [![Build Status](https://travis-ci.org/storix/RxDiffUtil.svg?branch=master)](https://travis-ci.org/storix/RxDiffUtil)
 [![codecov](https://codecov.io/gh/storix/RxDiffUtil/branch/master/graph/badge.svg)](https://codecov.io/gh/storix/RxDiffUtil)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/storix/RxDiffUtil/blob/master/LICENSE)
+[ ![Download](https://api.bintray.com/packages/storix/maven/rxdiffutil/images/download.svg) ](https://bintray.com/storix/maven/rxdiffutil/_latestVersion)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.storix/rxdiffutil/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.storix/rxdiffutil)
 
 RxDiffUtil is a lightweight Rx wrapper around [DiffUtil](https://developer.android.com/reference/android/support/v7/util/DiffUtil.html) from Android support library.
 
 Under the hood it automates a lot of things, such as background processing of multiple [calculateDiff](<https://developer.android.com/reference/android/support/v7/util/DiffUtil.html#calculateDiff(android.support.v7.util.DiffUtil.Callback, boolean)>) operations, binding to `Activity` lifecycle (`AppCompatActivity` is also supported), automatic `RecyclerView.Adapter` updating etc.
 
-You do not need to be an expert of [RxJava](https://github.com/ReactiveX/RxJava). It is possible to initiate diff requests with just one line of code even without subscribing. Really! :metal::tada:
+You do not need to be an expert of [RxJava](https://github.com/ReactiveX/RxJava). It is possible to handle the difference calculations with just one line of code. Really! :metal::tada:
 
 ****
 
 ### Requirements
 * minSdkVersion: 14
+
+### Dependency
+
+* Gradle 
+
+```groovy
+compile 'io.github.storix:rxdiffutil:0.2.0'
+```
+
+* Maven
+
+```xml
+<dependency>
+  <groupId>io.github.storix</groupId>
+  <artifactId>rxdiffutil</artifactId>
+  <version>0.2.0</version>
+  <type>pom</type>
+</dependency>
+```
+
+* Ivy
+```xml
+<dependency org='io.github.storix' name='rxdiffutil' rev='0.2.0'>
+  <artifact name='rxdiffutil' ext='pom' ></artifact>
+</dependency>
+```
+
 
 ### What is this all about?
 Using `RecyclerView` (and `RecyclerView.Adapter` as a consequence) we often encounter situations when we need to make a lot of changes to the data source and then notify somehow our adapter in the most efficient way :chart_with_upwards_trend:.
