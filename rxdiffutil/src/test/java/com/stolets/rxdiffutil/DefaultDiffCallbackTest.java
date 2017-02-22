@@ -91,4 +91,14 @@ public class DefaultDiffCallbackTest {
         inOrder.verify(mockedAdapter).swapData(mockedData);
         inOrder.verify(mockedDiffResult).dispatchUpdatesTo(mockedAdapter);
     }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void getOldData_ReturnsUnmodifiableList() {
+        callback.getOldData().add(new TestModel("data", "tag"));
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void getNewData_ReturnsUnmodifiableList() {
+        callback.getNewData().add(new TestModel("data", "tag"));
+    }
 }

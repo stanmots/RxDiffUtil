@@ -36,6 +36,8 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
 public final class SupportActivityUtils {
+    private SupportActivityUtils() {}
+
     /**
      * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
      * performed by the {@code fragmentManager}.

@@ -38,6 +38,8 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
  * The class used to retrieve the diff request manager from the retained fragment.
  */
 final class DiffRequestManagerRetriever {
+    private DiffRequestManagerRetriever() {}
+
     /**
      * Determines the activity type (system or from the support library) and retrieves the {@link DiffRequestManager} from the appropriate retained fragment.
      * @param activity {@link Activity} request lifecycle is bound to.

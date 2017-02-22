@@ -36,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import static com.stolets.rxdiffutil.util.MockitoUtils.TEST_TAG;
+import static net.trajano.commons.testing.UtilityClassTestUtil.assertUtilityClassWellDefined;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -49,6 +50,11 @@ public class ActivityUtilsRoboTest extends BaseRoboTest {
     public void setup() {
         mFragment = new Fragment();
         mFragmentManager = getActivity().getFragmentManager();
+    }
+
+    @Test
+    public void it_IsUtilityClass() throws Exception {
+        assertUtilityClassWellDefined(ActivityUtils.class);
     }
 
     @Test

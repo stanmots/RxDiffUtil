@@ -36,6 +36,7 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
  */
 @SuppressWarnings("WeakerAccess")
 public final class RxDiffUtil {
+    private RxDiffUtil() {}
 
     /**
      * Creates the diff request builder that is used to configure request parameters.
