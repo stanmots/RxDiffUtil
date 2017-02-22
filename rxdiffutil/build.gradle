@@ -33,12 +33,12 @@ ext {
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
     }
 
-    bintrayUser = (System.getenv("BINTRAY_USER") ?: properties.getProperty("bintrayUser")) ?: ""
-    bintrayApiKey = (System.getenv("BINTRAY_KEY") ?: properties.getProperty("bintrayKey")) ?: ""
+    bintrayUser = System.getenv("BINTRAY_USER") ?: properties.getProperty("bintrayUser")
+    bintrayApiKey = System.getenv("BINTRAY_KEY") ?: properties.getProperty("bintrayKey")
 
-    sonatypeUsername = (System.getenv("SONATYPE_USER") ?: properties.getProperty("sonatypeUser")) ?: ""
-    sonatypePassword = (System.getenv("SONATYPE_PASSWORD") ?: properties.getProperty("sonatypePassword")) ?: ""
-    gpgPassphrase = (System.getenv("GPG_PASSPHRASE") ?: properties.getProperty("gpgPassphrase")) ?: ""
+    sonatypeUsername = System.getenv("SONATYPE_USER") ?: properties.getProperty("sonatypeUser")
+    sonatypePassword = System.getenv("SONATYPE_PASSWORD") ?: properties.getProperty("sonatypePassword")
+    gpgPassphrase = System.getenv("GPG_PASSPHRASE") ?: properties.getProperty("gpgPassphrase")
 
     bintrayRepo = 'maven'
     bintrayName = 'rxdiffutil'
