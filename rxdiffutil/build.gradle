@@ -55,7 +55,9 @@ ext {
     issueUrl = 'https://github.com/storix/RxDiffUtil/issues'
     notesFile = 'README.md'
 
-    libraryVersion = '0.2.0'
+    // The project version
+    project.version = '0.2.0'
+    libraryVersion =  project.version
     libraryVcsTag = libraryVersion
 
     developerId = 'Storix'
