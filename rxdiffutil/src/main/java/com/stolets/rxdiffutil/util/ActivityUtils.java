@@ -54,7 +54,7 @@ public final class ActivityUtils {
         checkNotNull(tag, "tag must not be null!");
         checkArgument(!tag.isEmpty(), "tag string must not be empty!");
 
-        removeCurrentFragment(fragmentManager, tag);
+        removeFragment(fragmentManager, tag);
 
         final FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(fragment, tag);
@@ -85,13 +85,14 @@ public final class ActivityUtils {
     }
 
     /**
-     * Removes the current fragment with the same tag if it exists to prevent duplicates.
+     * Removes the fragment with the given tag.
      *
      * @param fragmentManager A fragment manager which manages the fragment removal.
      * @param tag             A tag of the fragment that must be removed.
      */
-    private static void removeCurrentFragment(@NonNull final FragmentManager fragmentManager,
-                                              @NonNull final String tag) {
+    @SuppressWarnings("WeakerAccess")
+    public static void removeFragment(@NonNull final FragmentManager fragmentManager,
+                                      @NonNull final String tag) {
         final Fragment fragment = fragmentManager.findFragmentByTag(tag);
         if (fragment != null) {
             fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
