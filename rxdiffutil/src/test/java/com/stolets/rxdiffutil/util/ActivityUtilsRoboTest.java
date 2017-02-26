@@ -28,7 +28,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 
 import com.stolets.rxdiffutil.BaseRoboTest;
-import com.stolets.rxdiffutil.internal.Constants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +39,7 @@ import static net.trajano.commons.testing.UtilityClassTestUtil.assertUtilityClas
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 @RunWith(RobolectricTestRunner.class)
 public class ActivityUtilsRoboTest extends BaseRoboTest {
@@ -71,14 +71,38 @@ public class ActivityUtilsRoboTest extends BaseRoboTest {
     @Test
     public void findOrCreateFragment_RetrievesRetainedFragment() {
         // Given a fragment and the fragment manager
-
-        ActivityUtils.addFragmentToActivity(mFragmentManager, mFragment, Constants.RETAINED_FRAGMENT_TAG);
+        ActivityUtils.addFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
 
         // When
-        Fragment retrievedFragment = ActivityUtils.findOrCreateFragment(mFragmentManager, Constants.RETAINED_FRAGMENT_TAG);
+        Fragment retrievedFragment = ActivityUtils.findOrCreateFragment(mFragmentManager, TEST_TAG);
 
         // Then
         assertThat(retrievedFragment, notNullValue());
-        assertThat(retrievedFragment.getTag(), is(Constants.RETAINED_FRAGMENT_TAG));
+        assertThat(retrievedFragment.getTag(), is(TEST_TAG));
+    }
+
+    @Test
+    public void findOrCreateFragment_WhenFragmentNotFound_CreatesNewFragment() {
+        // Given the fragment manager
+
+        // When
+        Fragment retrievedFragment = ActivityUtils.findOrCreateFragment(mFragmentManager, TEST_TAG);
+
+        // Then
+        assertThat(retrievedFragment, notNullValue());
+        assertThat(retrievedFragment.getTag(), is(TEST_TAG));
+    }
+
+    @Test
+    public void removeFragment_BeginsRemoveTransaction() {
+        // Given a fragment and the fragment manager
+        ActivityUtils.addFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
+
+        // When
+        ActivityUtils.removeFragment(mFragmentManager, TEST_TAG);
+        mFragmentManager.executePendingTransactions();
+
+        // Then
+        assertThat(mFragmentManager.findFragmentByTag(TEST_TAG), nullValue());
     }
 }

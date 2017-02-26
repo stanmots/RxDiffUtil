@@ -28,7 +28,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.stolets.rxdiffutil.BaseRoboTest;
-import com.stolets.rxdiffutil.internal.Constants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +39,7 @@ import static net.trajano.commons.testing.UtilityClassTestUtil.assertUtilityClas
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 
 @RunWith(RobolectricTestRunner.class)
@@ -71,16 +71,41 @@ public class SupportActivityUtilsRoboTest extends BaseRoboTest {
     }
 
     @Test
-    public void findOrCreateFragment_RetrievesRetainedSupportFragment() {
+    public void findOrCreateSupportFragment_RetrievesRetainedSupportFragment() {
         // Given a support fragment and the fragment manager
-        SupportActivityUtils.addSupportFragmentToActivity(mFragmentManager, mFragment, Constants.RETAINED_FRAGMENT_TAG);
+        SupportActivityUtils.addSupportFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
 
         // When
-        Fragment retrievedFragment = SupportActivityUtils.findOrCreateSupportFragment(mFragmentManager, Constants.RETAINED_FRAGMENT_TAG);
+        Fragment retrievedFragment = SupportActivityUtils.findOrCreateSupportFragment(mFragmentManager, TEST_TAG);
 
         // Then
         assertThat(retrievedFragment, notNullValue());
-        assertThat(retrievedFragment.getTag(), is(Constants.RETAINED_FRAGMENT_TAG));
+        assertThat(retrievedFragment.getTag(), is(TEST_TAG));
+    }
+
+    @Test
+    public void findOrCreateSupportFragment_WhenFragmentNotFound_CreatesNewFragment() {
+        // Given the fragment manager
+
+        // When
+        Fragment retrievedFragment = SupportActivityUtils.findOrCreateSupportFragment(mFragmentManager, TEST_TAG);
+
+        // Then
+        assertThat(retrievedFragment, notNullValue());
+        assertThat(retrievedFragment.getTag(), is(TEST_TAG));
+    }
+
+    @Test
+    public void removeFragment_BeginsRemoveTransaction() {
+        // Given a support fragment and the fragment manager
+        SupportActivityUtils.addSupportFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
+
+        // When
+        SupportActivityUtils.removeSupportFragment(mFragmentManager, TEST_TAG);
+        mFragmentManager.executePendingTransactions();
+
+        // Then
+        assertThat(mFragmentManager.findFragmentByTag(TEST_TAG), nullValue());
     }
 }
 
