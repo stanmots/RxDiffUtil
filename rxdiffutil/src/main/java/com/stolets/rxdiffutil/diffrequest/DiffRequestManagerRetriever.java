@@ -52,7 +52,7 @@ final class DiffRequestManagerRetriever {
     }
 
     @NonNull
-    private static DiffRequestManager findOrCreateManager(@NonNull final Activity activity) {
+    static DiffRequestManager findOrCreateManager(@NonNull final Activity activity) {
         if (activity instanceof AppCompatActivity) {
             final AppCompatActivity compatActivity = (AppCompatActivity) activity;
             return ((SupportDiffRequestManagerFragment) SupportActivityUtils.

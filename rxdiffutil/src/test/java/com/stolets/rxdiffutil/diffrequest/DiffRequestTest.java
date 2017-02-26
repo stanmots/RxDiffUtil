@@ -35,6 +35,7 @@ import org.mockito.Mock;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 
 public class DiffRequestTest extends BaseTest {
     @Mock
@@ -69,5 +70,10 @@ public class DiffRequestTest extends BaseTest {
         // unequal to null
         //noinspection ObjectEqualsNull
         assertThat(diffRequest1.equals(null), is(false));
+    }
+
+    @Test
+    public void toString_IsCorrect() {
+        assertThat(new DiffRequest(true, Constants.DIFF_REQUEST_DEFAULT_TAG, mDataComparable).toString(), startsWith("DiffRequest"));
     }
 }

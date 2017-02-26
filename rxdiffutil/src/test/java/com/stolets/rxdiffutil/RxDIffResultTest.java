@@ -32,6 +32,7 @@ import org.mockito.Mock;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 
 public class RxDIffResultTest extends BaseTest {
     private static final String TEST_TAG = "TEST_TAG";
@@ -67,5 +68,10 @@ public class RxDIffResultTest extends BaseTest {
         // unequal to null
         //noinspection ObjectEqualsNull
         assertThat(diffResult1.equals(null), is(false));
+    }
+
+    @Test
+    public void toString_IsCorrect() {
+        assertThat(new RxDiffResult(TEST_TAG, mDiffResult).toString(), startsWith("RxDiffResult"));
     }
 }
