@@ -55,7 +55,7 @@ ext {
     notesFile = 'README.md'
 
     // The project version
-    project.version = '0.2.0'
+    project.version = '0.2.1'
     libraryVersion =  project.version
     libraryVcsTag = libraryVersion
 

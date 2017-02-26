@@ -23,7 +23,7 @@ You do not need to be an expert of [RxJava](https://github.com/ReactiveX/RxJava)
 * Gradle 
 
 ```groovy
-compile 'io.github.storix:rxdiffutil:0.2.0'
+compile 'io.github.storix:rxdiffutil:0.2.1'
 ```
 
 * Maven
@@ -32,14 +32,14 @@ compile 'io.github.storix:rxdiffutil:0.2.0'
 <dependency>
   <groupId>io.github.storix</groupId>
   <artifactId>rxdiffutil</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   <type>pom</type>
 </dependency>
 ```
 
 * Ivy
 ```xml
-<dependency org='io.github.storix' name='rxdiffutil' rev='0.2.0'>
+<dependency org='io.github.storix' name='rxdiffutil' rev='0.2.1'>
   <artifact name='rxdiffutil' ext='pom' ></artifact>
 </dependency>
 ```
