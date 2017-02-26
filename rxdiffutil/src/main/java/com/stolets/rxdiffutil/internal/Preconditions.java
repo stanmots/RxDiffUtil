@@ -24,6 +24,7 @@
 
 package com.stolets.rxdiffutil.internal;
 
+import android.os.Looper;
 import android.support.annotation.Nullable;
 
 /**
@@ -64,6 +65,19 @@ public final class Preconditions {
     public static void checkArgument(boolean expression, @Nullable Object errorMessage) {
         if (!expression) {
             throw new IllegalArgumentException(String.valueOf(errorMessage));
+        }
+    }
+
+    /**
+     * Ensures that the current thread is the main thread.
+     *
+     * @param errorMessage the exception message
+     *
+     * @throws IllegalStateException if the current thread is not the main thread.
+     */
+    public static void ensureMainThread(@Nullable Object errorMessage) {
+        if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+            throw new IllegalStateException(String.valueOf(errorMessage));
         }
     }
 }
