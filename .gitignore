@@ -41,6 +41,9 @@ captures/
 .idea/gradle.xml
 .idea/libraries
 
+# Kotlin
+.idea/kotlinc.xml
+
 # Keystore files
 *.jks
 
