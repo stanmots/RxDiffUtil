@@ -45,6 +45,7 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
+import static com.stolets.rxdiffutil.internal.Preconditions.ensureMainThread;
 
 /**
  * Manages the diff requests lifecycle.
@@ -75,8 +76,8 @@ public final class DiffRequestManager {
      */
     @SuppressWarnings("unused")
     public DiffRequestManager(@NonNull final Map<String, DiffRequest> requests,
-                       @NonNull final Map<String, Disposable> subscriptions,
-                       @NonNull final CompositeDisposable compositeDisposable) {
+                              @NonNull final Map<String, Disposable> subscriptions,
+                              @NonNull final CompositeDisposable compositeDisposable) {
         checkNotNull(requests, "requests must not be null!");
         checkNotNull(subscriptions, "subscriptions must not be null!");
         checkNotNull(compositeDisposable, "compositeDisposable must not be null!");
@@ -136,14 +137,15 @@ public final class DiffRequestManager {
         // Remove the current subscription for the request with the same tag
         dispose(tag);
 
-        final Single<RxDiffResult> diffResultSingle = single(diffRequest).cache();
+        final Single<RxDiffResult> diffResultSingle = single(diffRequest)
+                .cache()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
 
         // Check whether we should subscribe to the single here
         if (diffRequest.getDiffCallback() instanceof DefaultDiffCallback) {
             final DefaultDiffCallback defaultDiffCallback = (DefaultDiffCallback) diffRequest.getDiffCallback();
             final Disposable disposable = diffResultSingle
-                    .subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new DiffResultSubscriber(defaultDiffCallback));
 
             registerDisposable(disposable, diffRequest.getTag());
@@ -213,6 +215,8 @@ public final class DiffRequestManager {
         @Override
         @UiThread
         public void accept(@io.reactivex.annotations.NonNull RxDiffResult rxDiffResult, @io.reactivex.annotations.NonNull Throwable throwable) throws Exception {
+            ensureMainThread("The diff result must be obtained on the main thread");
+
             if (throwable != null && throwable.getMessage() != null) {
                 throw new IllegalStateException("Failed to calculate diff", throwable);
             }
