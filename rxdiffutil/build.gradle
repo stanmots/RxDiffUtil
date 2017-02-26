@@ -83,6 +83,9 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         consumerProguardFiles 'proguard-rules.pro'
+
+        // see https://code.google.com/p/android/issues/detail?id=223575
+        return void
     }
 
     testOptions {
