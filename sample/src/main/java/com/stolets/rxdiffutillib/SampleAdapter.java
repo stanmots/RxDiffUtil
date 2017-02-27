@@ -57,7 +57,7 @@ public final class SampleAdapter extends RecyclerView.Adapter<SampleAdapter.View
     }
 
     @Override
-    public void swapData(List<SampleModel> updatedList) {
+    public void swapData(@NonNull final List<SampleModel> updatedList) {
         this.mSampleModelList = updatedList;
     }
 }

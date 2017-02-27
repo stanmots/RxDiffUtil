@@ -24,6 +24,8 @@
 
 package com.stolets.rxdiffutil;
 
+import android.support.annotation.NonNull;
+
 /**
  * Defines the method that returns a unique identifier used by {@link android.support.v7.util.DiffUtil.Callback#areItemsTheSame(int, int)}.
  *
@@ -31,5 +33,6 @@ package com.stolets.rxdiffutil;
  */
 @SuppressWarnings("WeakerAccess")
 public interface Identifiable<I> {
+    @NonNull
     I getId();
 }

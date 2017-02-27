@@ -24,6 +24,8 @@
 
 package com.stolets.rxdiffutil;
 
+import android.support.annotation.NonNull;
+
 import java.util.List;
 
 /**
@@ -38,5 +40,5 @@ public interface Swappable<U> {
      *
      * @param newData {@link List} with the new data which will replace the old data.
      */
-    void swapData(List<U> newData);
+    void swapData(@NonNull final List<U> newData);
 }
