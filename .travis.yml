@@ -9,7 +9,7 @@ android:
     - tools
     - platform-tools
 
-    - build-tools-25.0.0
+    - build-tools-25.0.2
     - android-25
 
     # Additional components
