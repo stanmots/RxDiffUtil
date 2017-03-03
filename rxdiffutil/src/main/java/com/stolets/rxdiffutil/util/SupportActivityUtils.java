@@ -30,7 +30,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import com.stolets.rxdiffutil.diffrequest.DiffRequestManager;
-import com.stolets.rxdiffutil.diffrequest.SupportDiffRequestManagerFragment;
+import com.stolets.rxdiffutil.diffrequest.DiffRequestManagerHolder;
+import com.stolets.rxdiffutil.diffrequest.SupportDiffRequestManagerHolderFragment;
+
+import java.util.HashMap;
 
 import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
@@ -78,7 +81,7 @@ public final class SupportActivityUtils {
         Fragment fragment = fragmentManager.findFragmentByTag(tag);
 
         if (fragment == null) {
-            fragment = SupportDiffRequestManagerFragment.newInstance(new DiffRequestManager());
+            fragment = SupportDiffRequestManagerHolderFragment.newInstance(new DiffRequestManagerHolder(new HashMap<String, DiffRequestManager>()));
             addSupportFragmentToActivity(fragmentManager, fragment, tag);
         }
 

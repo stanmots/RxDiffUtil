@@ -59,7 +59,7 @@ public class ActivityUtilsRoboTest extends BaseRoboTest {
 
     @Test
     public void addFragmentToActivity_AddsNewFragment() {
-        // Given a fragment and the fragment manager
+        // Given the fragment and the fragment manager
 
         // When
         ActivityUtils.addFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
@@ -69,12 +69,12 @@ public class ActivityUtilsRoboTest extends BaseRoboTest {
     }
 
     @Test
-    public void findOrCreateFragment_RetrievesRetainedFragment() {
-        // Given a fragment and the fragment manager
+    public void findOrCreateFragment_WhenFragmentFound_ReturnsIt() {
+        // Given the fragment and the fragment manager
         ActivityUtils.addFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
 
         // When
-        Fragment retrievedFragment = ActivityUtils.findOrCreateFragment(mFragmentManager, TEST_TAG);
+        final Fragment retrievedFragment = ActivityUtils.findOrCreateFragment(mFragmentManager, TEST_TAG);
 
         // Then
         assertThat(retrievedFragment, notNullValue());
@@ -86,7 +86,7 @@ public class ActivityUtilsRoboTest extends BaseRoboTest {
         // Given the fragment manager
 
         // When
-        Fragment retrievedFragment = ActivityUtils.findOrCreateFragment(mFragmentManager, TEST_TAG);
+        final Fragment retrievedFragment = ActivityUtils.findOrCreateFragment(mFragmentManager, TEST_TAG);
 
         // Then
         assertThat(retrievedFragment, notNullValue());

@@ -24,33 +24,41 @@
 
 package com.stolets.rxdiffutil.util;
 
+import android.annotation.SuppressLint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
-import com.stolets.rxdiffutil.BaseRoboTest;
+import com.stolets.rxdiffutil.BaseTest;
+import com.stolets.rxdiffutil.diffrequest.SupportDiffRequestManagerHolderFragment;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
+import org.mockito.Mock;
 
 import static com.stolets.rxdiffutil.util.MockitoUtils.TEST_TAG;
 import static net.trajano.commons.testing.UtilityClassTestUtil.assertUtilityClassWellDefined;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 
-@RunWith(RobolectricTestRunner.class)
-public class SupportActivityUtilsRoboTest extends BaseRoboTest {
-    private FragmentManager mFragmentManager;
-    private Fragment mFragment;
+public class SupportActivityUtilsTest extends BaseTest {
+    @Mock
+    FragmentManager mFragmentManager;
+    @Mock
+    Fragment mFragment;
+    @Mock
+    FragmentTransaction mFragmentTransaction;
 
+    @SuppressLint("CommitTransaction")
     @Before
     public void setup() {
-        mFragment = new Fragment();
-        mFragmentManager = getActivity().getSupportFragmentManager();
+        given(mFragmentManager.beginTransaction()).willReturn(mFragmentTransaction);
+        given(mFragmentTransaction.remove(mFragment)).willReturn(mFragmentTransaction);
     }
 
     @Test
@@ -58,29 +66,40 @@ public class SupportActivityUtilsRoboTest extends BaseRoboTest {
         assertUtilityClassWellDefined(SupportActivityUtils.class);
     }
 
-
     @Test
     public void addSupportFragmentToActivity_AddsNewFragment() {
-        // Given a support fragment and the fragment manager
+        // Given the support fragment and the fragment manager
 
         // When
         SupportActivityUtils.addSupportFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
 
         // Then
-        assertThat(mFragmentManager.findFragmentByTag(TEST_TAG), notNullValue());
+        then(mFragmentTransaction).should().add(mFragment, TEST_TAG);
     }
 
     @Test
-    public void findOrCreateSupportFragment_RetrievesRetainedSupportFragment() {
-        // Given a support fragment and the fragment manager
-        SupportActivityUtils.addSupportFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
+    public void addSupportFragmentToActivity_WhenFragmentWithGivenTagExists_ThenRemovesDuplicate() {
+        // Given
+        given(mFragmentManager.findFragmentByTag(TEST_TAG)).willReturn(mFragment);
 
         // When
-        Fragment retrievedFragment = SupportActivityUtils.findOrCreateSupportFragment(mFragmentManager, TEST_TAG);
+        SupportActivityUtils.addSupportFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
+
+        // Then
+        then(mFragmentTransaction).should().remove(mFragment);
+    }
+
+    @Test
+    public void findOrCreateSupportFragment_WhenFragmentFound_ReturnsIt() {
+        // Given the support fragment and the fragment manager
+        given(mFragmentManager.findFragmentByTag(TEST_TAG)).willReturn(mFragment);
+
+        // When
+        final Fragment retrievedFragment = SupportActivityUtils.findOrCreateSupportFragment(mFragmentManager, TEST_TAG);
 
         // Then
         assertThat(retrievedFragment, notNullValue());
-        assertThat(retrievedFragment.getTag(), is(TEST_TAG));
+        assertThat(retrievedFragment, is(mFragment));
     }
 
     @Test
@@ -88,24 +107,11 @@ public class SupportActivityUtilsRoboTest extends BaseRoboTest {
         // Given the fragment manager
 
         // When
-        Fragment retrievedFragment = SupportActivityUtils.findOrCreateSupportFragment(mFragmentManager, TEST_TAG);
+        final Fragment retrievedFragment = SupportActivityUtils.findOrCreateSupportFragment(mFragmentManager, TEST_TAG);
 
         // Then
         assertThat(retrievedFragment, notNullValue());
-        assertThat(retrievedFragment.getTag(), is(TEST_TAG));
-    }
-
-    @Test
-    public void removeFragment_BeginsRemoveTransaction() {
-        // Given a support fragment and the fragment manager
-        SupportActivityUtils.addSupportFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
-
-        // When
-        SupportActivityUtils.removeSupportFragment(mFragmentManager, TEST_TAG);
-        mFragmentManager.executePendingTransactions();
-
-        // Then
-        assertThat(mFragmentManager.findFragmentByTag(TEST_TAG), nullValue());
+        assertThat(retrievedFragment, instanceOf(SupportDiffRequestManagerHolderFragment.class));
     }
 }
 

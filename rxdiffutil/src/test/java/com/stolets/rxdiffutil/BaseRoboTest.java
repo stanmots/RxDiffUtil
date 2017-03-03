@@ -24,28 +24,26 @@
 
 package com.stolets.rxdiffutil;
 
-import android.os.Bundle;
+import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
 import org.junit.After;
 import org.junit.Before;
 import org.robolectric.Robolectric;
-import org.robolectric.util.ActivityController;
+import org.robolectric.android.controller.ActivityController;
 
-public abstract class BaseRoboTest {
-    private AppCompatActivity mActivity;
-    private ActivityController<ThemeCompatActivity> mActivityController;
+public abstract class BaseRoboTest extends BaseTest {
+    private Activity mActivity;
+    private ActivityController<Activity> mActivityController;
 
     @Before
-    public void setupBase() {
-        setActivityController(Robolectric.buildActivity(ThemeCompatActivity.class));
-        setActivity(getActivityController().create().start().resume().visible().get());
+    public void setupBaseRoboTestBefore() {
+        setActivityController(Robolectric.buildActivity(Activity.class));
+        setActivity(getActivityController().create().get());
     }
 
     @After
-    public void tearDownBase() {
+    public void tearDownBaseRoboTestAfter() {
         mActivityController.pause()
                 .stop()
                 .destroy();
@@ -53,31 +51,23 @@ public abstract class BaseRoboTest {
 
     @NonNull
     @SuppressWarnings("WeakerAccess")
-    public AppCompatActivity getActivity() {
+    public Activity getActivity() {
         return mActivity;
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void setActivity(@NonNull final AppCompatActivity activity) {
+    public void setActivity(@NonNull final Activity activity) {
         mActivity = activity;
     }
 
     @NonNull
     @SuppressWarnings("WeakerAccess")
-    public ActivityController<ThemeCompatActivity> getActivityController() {
+    public ActivityController<Activity> getActivityController() {
         return mActivityController;
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void setActivityController(@NonNull final ActivityController<ThemeCompatActivity> activityController) {
+    public void setActivityController(@NonNull final ActivityController<Activity> activityController) {
         mActivityController = activityController;
-    }
-
-    static class ThemeCompatActivity extends AppCompatActivity {
-        @Override
-        protected void onCreate(@Nullable Bundle savedInstanceState) {
-            setTheme(R.style.Robolectric_Test_CompatTheme);
-            super.onCreate(savedInstanceState);
-        }
     }
 }

@@ -39,7 +39,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public abstract class BaseTest {
     @BeforeClass
-    public static void setupBaseBeforeClass() {
+    public static void setupBaseTestBeforeClass() {
         RxJavaPlugins.onComputationScheduler(Schedulers.trampoline());
 
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(new Function<Callable<Scheduler>, Scheduler>() {
@@ -53,7 +53,7 @@ public abstract class BaseTest {
      * The @Before methods of the base class will be run before those of the subclasses.
      */
     @Before
-    public void setupBaseBefore() {
+    public void setupBaseTestBefore() {
         MockitoAnnotations.initMocks(this);
     }
 }
