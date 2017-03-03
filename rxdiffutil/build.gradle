@@ -26,7 +26,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'jacoco-android'
 
 ext {
-
     // Try to read properties defined in local.properties
     Properties properties = new Properties()
     if (project.rootProject.file('local.properties').exists()) {
@@ -55,8 +54,8 @@ ext {
     notesFile = 'README.md'
 
     // The project version
-    project.version = '0.2.1'
-    libraryVersion =  project.version
+    project.version = projectVersion
+    libraryVersion = project.version
     libraryVcsTag = libraryVersion
 
     developerId = 'Storix'
@@ -71,21 +70,23 @@ ext {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 25
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "0.1.1"
+        versionName rootProject.ext.projectVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         consumerProguardFiles 'proguard-rules.pro'
+    }
 
-        // see https://code.google.com/p/android/issues/detail?id=223575
-        return void
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibilityVersion
+        targetCompatibility rootProject.ext.sourceCompatibilityVersion
     }
 
     testOptions {
@@ -103,7 +104,7 @@ android {
 }
 
 jacoco {
-    toolVersion = "0.7.9"
+    toolVersion = rootProject.ext.jacocoToolVersion
 }
 
 jacocoAndroidUnitTestReport {
@@ -122,26 +123,24 @@ afterEvaluate {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile "com.android.support:appcompat-v7:$support_lib_version"
-    compile "com.android.support:recyclerview-v7:$support_lib_version"
+    // Android/Google
+    compile deps.appcompatv7
+    compile deps.recyclerviewv7
 
-    // RxJava
-    compile 'io.reactivex.rxjava2:rxjava:2.0.6'
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    // Rx
+    compile deps.rxJava
+    compile deps.rxAndroid
+    compile deps.rxRelay
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'net.trajano.commons:commons-testing:1.0.1'
-    testCompile 'org.hamcrest:hamcrest-library:1.3'
-    testCompile 'org.mockito:mockito-core:2.7.10'
-    testCompile "org.robolectric:robolectric:3.3-SNAPSHOT"
+    testCompile deps.junit
+    testCompile deps.commonsTesting
+    testCompile deps.hamcrest
+    testCompile deps.mockitoCore
+    testCompile deps.robolectricCore
 
     // This dependency is needed to fix Robolectric bug
     // See https://github.com/robolectric/robolectric/issues/1932
-    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
-
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    testCompile deps.openGlAndroidApi
 }
 
 apply from: '../scripts/generatePom.gradle'
