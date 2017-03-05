@@ -32,6 +32,8 @@ import android.view.ViewGroup;
 import java.util.List;
 
 public class TestAdapter<T> extends RecyclerView.Adapter<TestAdapter.TestViewHolder> implements Swappable<T> {
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    private List<T> mData;
     @Override
     public TestAdapter.TestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new TestViewHolder(parent);
@@ -49,7 +51,15 @@ public class TestAdapter<T> extends RecyclerView.Adapter<TestAdapter.TestViewHol
 
     @Override
     public void swapData(@NonNull final List<T> newData) {
+        mData = newData;
+    }
 
+    public List<T> getData() {
+        return mData;
+    }
+
+    public void setData(List<T> data) {
+        mData = data;
     }
 
     static class TestViewHolder extends RecyclerView.ViewHolder {

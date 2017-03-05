@@ -24,35 +24,53 @@
 
 package com.stolets.rxdiffutil.diffrequest;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
-import com.stolets.rxdiffutil.internal.Constants;
+import java.util.List;
 
-import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
 /**
  * The builder used to supply the required input to start difference calculation.
  */
-public final class DiffRequestBuilder {
+@SuppressWarnings("WeakerAccess")
+public final class DiffRequestBuilder<D> {
     @NonNull
-    private final DiffUtil.Callback mDiffCallback;
+    private final Manager<D> mDiffRequestManager;
     @NonNull
-    private String mTag = Constants.DIFF_REQUEST_DEFAULT_TAG;
+    private final String mTag;
+    @NonNull
+    private final DiffUtil.Callback mCallback;
+    @Nullable
+    private List<D> mNewData;
     private boolean mDetectMoves;
 
     /**
      * Constructs a new {@link DiffRequestBuilder} instance.
      *
-     * @param diffCallback The concrete implementation of {@link DiffUtil.Callback}.
-     *                     You can pass {@link com.stolets.rxdiffutil.DefaultDiffCallback} to swapData {@link android.support.v7.widget.RecyclerView.Adapter} automatically.
+     * @param diffRequestManager The {@link DiffRequestManager} the built request will be automatically executed by.
+     * @param callback           The concrete implementation of {@link DiffUtil.Callback}.
+     * @throws NullPointerException If the diffRequestManager or callback is null.
      */
-    public DiffRequestBuilder(@NonNull final DiffUtil.Callback diffCallback) {
-        checkNotNull(diffCallback, "diffCallback must not be null!");
+    public DiffRequestBuilder(@NonNull final Manager<D> diffRequestManager,
+                              @NonNull final DiffUtil.Callback callback) {
+        checkNotNull(diffRequestManager, "diffRequestManager must not be null!");
+        checkNotNull(callback, "callback must not be null!");
 
-        this.mDiffCallback = diffCallback;
+        this.mDiffRequestManager = diffRequestManager;
+        this.mCallback = callback;
+        this.mTag = diffRequestManager.getTag();
+    }
+
+    /**
+     * Forwards the call to {@link DiffRequestBuilder#DiffRequestBuilder(Manager, DiffUtil.Callback)} ensuring type safety.
+     */
+    @NonNull
+    public static <T> DiffRequestBuilder<T> create(@NonNull final Manager<T> diffRequestManager,
+                                                   @NonNull final DiffUtil.Callback callback) {
+        return new DiffRequestBuilder<>(diffRequestManager, callback);
     }
 
     /**
@@ -61,70 +79,48 @@ public final class DiffRequestBuilder {
      * @return {@link DiffRequestBuilder}.
      */
     @NonNull
-    @SuppressWarnings("WeakerAccess")
-    public DiffRequestBuilder detectMoves(final boolean detectMoves) {
+    public DiffRequestBuilder<D> detectMoves(final boolean detectMoves) {
         mDetectMoves = detectMoves;
         return this;
     }
 
     /**
-     * @param tag A {@link String} that represents a unique identifier of the request.
-     *            When you are making a new request the previous request with the same tag will be cancelled (if it is still in progress).
-     *            You can skip it if your {@link Activity} manages just one {@link android.support.v7.widget.RecyclerView}.
+     * Supplies the list with the new data to update the recycler view adapter when the diff calculation is complete.
+     *
+     * @param newData The new data.
      * @return {@link DiffRequestBuilder}.
+     * @throws NullPointerException If the given new data list is null.
      */
     @NonNull
-    @SuppressWarnings("WeakerAccess")
-    public DiffRequestBuilder tag(@NonNull final String tag) {
-        checkNotNull(tag, "tag must not be null!");
-        checkArgument(!tag.isEmpty(), "tag string must not be empty!");
-        mTag = tag;
+    public DiffRequestBuilder<D> updateAdapterWithNewData(@NonNull final List<D> newData) {
+        checkNotNull(newData, "newData must not be null!");
+        this.mNewData = newData;
         return this;
     }
 
     /**
-     * Binds the constructed {@link DiffRequest} to the activity lifecycle.
-     *
-     * @param activity The {@link Activity} that determines the lifecycle of the background calculations.
-     *                 When the activity is destroyed and finished (isFinishing = true) all current calculations are cancelled automatically.
-     * @return {@link DiffRequestManagerWrapper} you can use to start the difference calculation.
+     * Constructs the {@link DiffRequest} and initiates the difference calculation.
      */
-    @NonNull
-    @SuppressWarnings("WeakerAccess")
-    public DiffRequestManagerWrapper bindTo(@NonNull final Activity activity) {
-        checkNotNull(activity, "activity must not be null!");
+    public void calculate() {
+        // Build the request
+        final DiffRequest<D> diffRequest = new DiffRequest<>(mDetectMoves, mTag, mNewData, mCallback);
 
-        final DiffRequestManager diffRequestManager = DiffRequestManagerRetriever.retrieve(activity);
-        final DiffRequest diffRequest = new DiffRequest(this.mDetectMoves, this.mTag, this.mDiffCallback);
-
-        diffRequestManager.addPendingRequest(diffRequest);
-
-        return new DiffRequestManagerWrapper(diffRequestManager, this.mTag);
+        // Start diff calculation
+        mDiffRequestManager.execute(diffRequest);
     }
 
     /**
-     * @return A concrete implementation of {@link DiffUtil.Callback}.
+     * @return Boolean flag indicating whether the moves in the lists must be detected.
      */
-    @NonNull
-    @SuppressWarnings("WeakerAccess")
-    public DiffUtil.Callback getDiffCallback() {
-        return mDiffCallback;
-    }
-
-    /**
-     * @return A tag string.
-     */
-    @NonNull
-    @SuppressWarnings("WeakerAccess")
-    public String getTag() {
-        return mTag;
-    }
-
-    /**
-     * @return DetectMoves boolean flag.
-     */
-    @SuppressWarnings("WeakerAccess")
     public boolean isDetectingMoves() {
         return mDetectMoves;
+    }
+
+    /**
+     * @return Current list with the calculated new data.
+     */
+    @Nullable
+    List<D> getNewData() {
+        return mNewData;
     }
 }

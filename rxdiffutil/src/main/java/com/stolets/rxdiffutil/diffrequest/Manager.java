@@ -22,34 +22,25 @@
  * SOFTWARE.
  */
 
-package com.stolets.rxdiffutil;
+package com.stolets.rxdiffutil.diffrequest;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
-import com.stolets.rxdiffutil.diffrequest.DiffRequestManagerHolder;
-import com.stolets.rxdiffutil.diffrequest.DiffRequestManagerHolderRetriever;
-
-import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
-
 /**
- * Represents an entry point for making diff requests.
+ * Defines methods for the manager that can handle the {@link DiffRequest}.
+ *
+ * @param <D> The type of data used in the difference calculations.
  */
-@SuppressWarnings("WeakerAccess")
-public final class RxDiffUtil {
-    private RxDiffUtil() {
-    }
+interface Manager<D> {
+    /**
+     * Performs the difference calculations in accordance with the parameters set in a diff request.
+     *
+     * @param diffRequest The {@link DiffRequest}.
+     */
+    void execute(@NonNull final DiffRequest<D> diffRequest);
 
     /**
-     * Creates the retained fragment that is used to listen to the given activity lifecycle events.
-     *
-     * @param activity The {@link Activity} the diff requests lifecycle will be bound to.
-     * @return The {@link DiffRequestManagerHolder} retrieved from the retained fragment.
-     * @throws NullPointerException If the given activity is null.
+     * @return The unique identifier of the manager.
      */
-    @NonNull
-    public static DiffRequestManagerHolder bindTo(@NonNull final Activity activity) {
-        checkNotNull(activity, "activity must not be null!");
-        return DiffRequestManagerHolderRetriever.retrieveFrom(activity);
-    }
+    String getTag();
 }

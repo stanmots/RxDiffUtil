@@ -25,19 +25,27 @@
 package com.stolets.rxdiffutil.diffrequest;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
+
+import java.util.List;
 
 import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
 /**
  * Holds all the required data to start the difference calculation.
+ *
+ * @param <D> The data type that is used in difference calculation.
  */
-public final class DiffRequest {
+@SuppressWarnings("WeakerAccess")
+public final class DiffRequest<D> {
     @NonNull
     private final DiffUtil.Callback mDiffCallback;
     @NonNull
     private final String mTag;
+    @Nullable
+    private final List<D> mNewData;
     private final boolean mDetectMoves;
 
     /**
@@ -45,16 +53,20 @@ public final class DiffRequest {
      *
      * @param detectMoves  A boolean flag which determines whether moved items should be detected.
      * @param tag          A unique identifier of the request.
+     * @param newData      The data to update the adapter with when the calculations are finished. Can be null if you don't want to update the adapter automatically.
      * @param diffCallback A concrete implementation of {@link DiffUtil.Callback}.
+     * @throws NullPointerException     If the tag or callback is null.
+     * @throws IllegalArgumentException If the tag is empty.
      */
     @SuppressWarnings("WeakerAccess")
-    public DiffRequest(final boolean detectMoves, @NonNull final String tag, @NonNull final DiffUtil.Callback diffCallback) {
-        checkNotNull(diffCallback, "diffCallback must not be null!");
+    public DiffRequest(final boolean detectMoves, @NonNull final String tag, @Nullable final List<D> newData, @NonNull final DiffUtil.Callback diffCallback) {
         checkNotNull(tag, "tag string must not be null!");
         checkArgument(!tag.isEmpty(), "tag string must not be empty!");
+        checkNotNull(diffCallback, "diffCallback must not be null!");
 
         this.mDetectMoves = detectMoves;
         this.mTag = tag;
+        this.mNewData = newData;
         this.mDiffCallback = diffCallback;
     }
 
@@ -82,10 +94,20 @@ public final class DiffRequest {
         return mDetectMoves;
     }
 
+    /**
+     * @return The list with the new data or null.
+     */
+    @Nullable
+    public List<D> getNewData() {
+        return mNewData;
+    }
+
     @Override
     public String toString() {
         return "DiffRequest{" +
                 "mDiffCallback=" + mDiffCallback +
+                ", mTag='" + mTag + '\'' +
+                ", mNewData=" + mNewData +
                 ", mDetectMoves=" + mDetectMoves +
                 '}';
     }
@@ -95,17 +117,19 @@ public final class DiffRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DiffRequest that = (DiffRequest) o;
+        DiffRequest<?> that = (DiffRequest<?>) o;
 
         return mDetectMoves == that.mDetectMoves &&
-                mTag.equals(that.getTag()) &&
-                mDiffCallback.equals(that.mDiffCallback);
+                mDiffCallback.equals(that.mDiffCallback) &&
+                mTag.equals(that.mTag) &&
+                mNewData != null ? mNewData.equals(that.mNewData) : that.mNewData == null;
     }
 
     @Override
     public int hashCode() {
         int result = mDiffCallback.hashCode();
         result = 31 * result + mTag.hashCode();
+        result = 31 * result + (mNewData != null ? mNewData.hashCode() : 0);
         result = 31 * result + (mDetectMoves ? 1 : 0);
         return result;
     }

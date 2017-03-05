@@ -24,38 +24,31 @@
 
 package com.stolets.rxdiffutil;
 
-import android.app.Activity;
-import android.support.v7.util.DiffUtil;
-
-import com.stolets.rxdiffutil.diffrequest.DiffRequestBuilder;
+import com.stolets.rxdiffutil.diffrequest.DiffRequestManagerHolder;
 
 import org.junit.Test;
-import org.mockito.Mock;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import static net.trajano.commons.testing.UtilityClassTestUtil.assertUtilityClassWellDefined;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
-public class RxDiffUtilTest extends BaseTest {
-    @Mock
-    Activity mActivity;
-
-    @Mock
-    DiffUtil.Callback mCallback;
-
+@RunWith(RobolectricTestRunner.class)
+public class RxDiffUtilTest extends BaseRoboTest {
     @Test
     public void it_IsUtilityClass() throws Exception {
         assertUtilityClassWellDefined(RxDiffUtil.class);
     }
 
     @Test
-    public void builder_ReturnsNotNullDiffRequestBuilder() {
-        // Given an activity and a callback
+    public void bindTo_ReturnsNonNullHolder() {
+        // Given an activity
 
         // When
-        final DiffRequestBuilder builder = RxDiffUtil.with(mCallback);
+        final DiffRequestManagerHolder holder = RxDiffUtil.bindTo(getActivity());
 
         // Then
-        assertThat(builder, notNullValue());
+        assertThat(holder, notNullValue());
     }
 }

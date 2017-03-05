@@ -24,44 +24,47 @@
 
 package com.stolets.rxdiffutil.diffrequest;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.support.v7.util.DiffUtil;
 
 import com.stolets.rxdiffutil.BaseTest;
+import com.stolets.rxdiffutil.TestAdapter;
+import com.stolets.rxdiffutil.TestModel;
 import com.stolets.rxdiffutil.util.MockitoUtils;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 public class DiffRequestBuilderTest extends BaseTest {
     private static final String TEST_TAG = "TEST_TAG";
     private final DiffUtil.Callback mCallback = MockitoUtils.getStubbedDefaultDiffCallback();
-    private DiffRequestBuilder mBuilder;
-
     @Mock
     Activity mActivity;
-
     @Mock
     FragmentManager mFragmentManager;
-
     @Mock
-    DiffRequestManagerFragment mDiffRequestManagerFragment;
-
+    DiffRequestManagerHolderFragment mDiffRequestManagerFragment;
     @Mock
-    DiffRequestManager mDiffRequestManager;
+    DiffRequestManager<TestModel, TestAdapter<TestModel>> mDiffRequestManager;
+    private DiffRequestBuilder<TestModel> mBuilder;
 
     @Before
     public void setup() {
-        mBuilder = new DiffRequestBuilder(mCallback);
+        given(mDiffRequestManager.getTag()).willReturn(TEST_TAG);
+        mBuilder = new DiffRequestBuilder<>(mDiffRequestManager, mCallback);
     }
 
     @Test
@@ -76,30 +79,31 @@ public class DiffRequestBuilderTest extends BaseTest {
     }
 
     @Test
-    public void tag_SetsRequestTag() {
+    public void create_ReturnsNonNullBuilder() {
+        final DiffRequestBuilder<TestModel> builder = DiffRequestBuilder.create(mDiffRequestManager, mCallback);
+        assertThat(builder, notNullValue());
+    }
+
+    @Test
+    public void updateAdapterWithNewData_SetsNewAdapterData() {
+        // Given
+        final List<TestModel> testList = new ArrayList<>();
+
+        // When
+        mBuilder.updateAdapterWithNewData(testList);
+
+        // Then
+        assertThat(mBuilder.getNewData(), equalTo(testList));
+    }
+
+    @Test
+    public void calculate_CreatesDiffRequest() {
         // Given a builder
 
         // When
-        mBuilder.tag(TEST_TAG);
+        mBuilder.calculate();
 
         // Then
-        assertThat(mBuilder.getTag(), is(TEST_TAG));
-    }
-
-    @SuppressLint("CommitTransaction")
-    @Test
-    public void build_ReturnsRequestManagerWithTag() {
-        // Given
-        mBuilder.tag(TEST_TAG);
-
-        given(mDiffRequestManagerFragment.getDiffRequestManager()).willReturn(mDiffRequestManager);
-        given(mFragmentManager.findFragmentByTag(anyString())).willReturn(mDiffRequestManagerFragment);
-        given(mActivity.getFragmentManager()).willReturn(mFragmentManager);
-
-        // When
-        final DiffRequestManagerWrapper rxRequestManager = mBuilder.bindTo(mActivity);
-
-        // Then
-        assertThat(rxRequestManager.getTag(), is(TEST_TAG));
+        then(mDiffRequestManager).should().execute(any(DiffRequest.class));
     }
 }

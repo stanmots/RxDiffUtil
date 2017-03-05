@@ -27,10 +27,15 @@ package com.stolets.rxdiffutil.diffrequest;
 import android.support.v7.util.DiffUtil;
 
 import com.stolets.rxdiffutil.BaseTest;
+import com.stolets.rxdiffutil.TestModel;
 import com.stolets.rxdiffutil.internal.Constants;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -40,12 +45,19 @@ import static org.hamcrest.Matchers.startsWith;
 public class DiffRequestTest extends BaseTest {
     @Mock
     private DiffUtil.Callback mDataComparable;
+    private DiffRequest<TestModel> mDiffRequest;
+    private List<TestModel> mNewData = new ArrayList<>();
+
+    @Before
+    public void setup() {
+        mDiffRequest = new DiffRequest<>(true, Constants.DIFF_REQUEST_MANAGER_DEFAULT_TAG, mNewData, mDataComparable);
+    }
 
     @Test
     public void it_ImplementsEquivalenceRelation() {
         // Given
-        final DiffRequest diffRequest1 = new DiffRequest(true, Constants.DIFF_REQUEST_DEFAULT_TAG, mDataComparable);
-        final DiffRequest diffRequest2 = new DiffRequest(true, Constants.DIFF_REQUEST_DEFAULT_TAG, mDataComparable);
+        final DiffRequest<String> diffRequest1 = new DiffRequest<>(true, Constants.DIFF_REQUEST_MANAGER_DEFAULT_TAG, null, mDataComparable);
+        final DiffRequest<String> diffRequest2 = new DiffRequest<>(true, Constants.DIFF_REQUEST_MANAGER_DEFAULT_TAG, null,mDataComparable);
 
         // When diffRequest1 is equal to diffRequest2
 
@@ -58,7 +70,7 @@ public class DiffRequestTest extends BaseTest {
         assertThat(diffRequest2, equalTo(diffRequest1));
 
         // transitive
-        final DiffRequest diffRequest3 = new DiffRequest(true, Constants.DIFF_REQUEST_DEFAULT_TAG, mDataComparable);
+        final DiffRequest<String> diffRequest3 = new DiffRequest<>(true, Constants.DIFF_REQUEST_MANAGER_DEFAULT_TAG, null, mDataComparable);
         assertThat(diffRequest1.equals(diffRequest3), is(true));
         assertThat(diffRequest2.equals(diffRequest3), is(true));
         assertThat(diffRequest1.equals(diffRequest2), is(true));
@@ -74,6 +86,26 @@ public class DiffRequestTest extends BaseTest {
 
     @Test
     public void toString_IsCorrect() {
-        assertThat(new DiffRequest(true, Constants.DIFF_REQUEST_DEFAULT_TAG, mDataComparable).toString(), startsWith("DiffRequest"));
+        assertThat(new DiffRequest<String>(true, Constants.DIFF_REQUEST_MANAGER_DEFAULT_TAG, null, mDataComparable).toString(), startsWith("DiffRequest"));
+    }
+
+    @Test
+    public void getDiffCallback_ReturnsCorrectCallback() {
+        assertThat(mDiffRequest.getDiffCallback(), equalTo(mDataComparable));
+    }
+
+    @Test
+    public void getTag_ReturnsCorrectTag() {
+        assertThat(mDiffRequest.getTag(), equalTo(Constants.DIFF_REQUEST_MANAGER_DEFAULT_TAG));
+    }
+
+    @Test
+    public void isDetectingMoves_ReturnsCorrectBoolean() {
+        assertThat(mDiffRequest.isDetectingMoves(), equalTo(true));
+    }
+
+    @Test
+    public void getNewData_ReturnsCorrectNewData() {
+        assertThat(mDiffRequest.getNewData(), equalTo(mNewData));
     }
 }

@@ -25,66 +25,93 @@
 package com.stolets.rxdiffutil.diffrequest;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.RecyclerView;
 
-import com.stolets.rxdiffutil.DefaultDiffCallback;
+import com.jakewharton.rxrelay2.PublishRelay;
+import com.jakewharton.rxrelay2.Relay;
 import com.stolets.rxdiffutil.RxDiffResult;
+import com.stolets.rxdiffutil.Swappable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.concurrent.Callable;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiConsumer;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.stolets.rxdiffutil.internal.Preconditions.assertMainThread;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkArgument;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
-import static com.stolets.rxdiffutil.internal.Preconditions.ensureMainThread;
 
 /**
- * Manages the diff requests lifecycle.
+ * Manages the diff request lifecycle.
+ *
+ * @param <D> Comparable data type.
+ * @param <A> The {@link RecyclerView.Adapter} type.
  */
-public final class DiffRequestManager {
+public final class DiffRequestManager<D, A extends RecyclerView.Adapter & Swappable<D>> implements DiffResultReceiver, Manager<D> {
     @NonNull
-    private final Map<String, DiffRequest> mPendingRequests;
+    private final String mTag;
     @NonNull
-    private final Map<String, Disposable> mCurrentSubscriptions;
+    private final Relay<RxDiffResult> mRelay;
     @NonNull
     private final CompositeDisposable mCompositeDisposable;
-
-    /**
-     * Default constructor.
-     */
-    public DiffRequestManager() {
-        this.mPendingRequests = new HashMap<>();
-        this.mCurrentSubscriptions = new HashMap<>();
-        this.mCompositeDisposable = new CompositeDisposable();
-    }
+    @NonNull
+    private WeakReference<A> mAdapterWeakRef;
+    @Nullable
+    private DiffRequest<D> mCurrentDiffRequest;
+    @Nullable
+    private DiffUtil.DiffResult mPendingResult;
+    @Nullable
+    private RxDiffResult mCachedResultForSubscription;
 
     /**
      * Constructs a new instance of {@link DiffRequestManager} with injected parameters.
      *
-     * @param requests            Inject concrete implementation of {@link Map} that holds pending requests.
-     * @param subscriptions       Inject concrete implementation of {@link Map} that holds current subscriptions.
+     * @param adapter             {@link RecyclerView.Adapter} that will be automatically updated and notified about the data changes. Note: the given adapter must implement {@link Swappable} interface.
+     * @param tag                 A {@link String} that represents a unique identifier of the manager.
+     * @param relay               {@link Relay}.
      * @param compositeDisposable Inject {@link CompositeDisposable}.
+     * @throws NullPointerException     If the tag, composite disposable or relay is null.
+     * @throws IllegalArgumentException If the tag is empty.
      */
-    @SuppressWarnings("unused")
-    public DiffRequestManager(@NonNull final Map<String, DiffRequest> requests,
-                              @NonNull final Map<String, Disposable> subscriptions,
+    public DiffRequestManager(@Nullable final A adapter,
+                              @NonNull final String tag,
+                              @NonNull final PublishRelay<RxDiffResult> relay,
                               @NonNull final CompositeDisposable compositeDisposable) {
-        checkNotNull(requests, "requests must not be null!");
-        checkNotNull(subscriptions, "subscriptions must not be null!");
+        checkNotNull(adapter, "adapter must not be null!");
+        checkNotNull(tag, "tag must not be null!");
+        checkArgument(!tag.isEmpty(), "tag string must not be empty!");
+        checkNotNull(relay, "relay must not be null!");
         checkNotNull(compositeDisposable, "compositeDisposable must not be null!");
 
-        this.mPendingRequests = requests;
-        this.mCurrentSubscriptions = subscriptions;
+        this.mAdapterWeakRef = new WeakReference<>(adapter);
+        this.mTag = tag;
+        this.mRelay = relay;
         this.mCompositeDisposable = compositeDisposable;
+    }
+
+    /**
+     * Creates a new instance of {@link DiffRequestManager}.
+     *
+     * @param adapter {@link RecyclerView.Adapter}.
+     * @param tag     A {@link String} identifying this manager.
+     * @param <D>     Diff request data type.
+     * @param <A>     The {@link RecyclerView.Adapter} type.
+     * @return {@link DiffRequestManager}.
+     */
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    @NonNull
+    public static <D, A extends RecyclerView.Adapter & Swappable<D>> DiffRequestManager<D, A> create(@NonNull final A adapter, @NonNull final String tag) {
+        final DiffRequestManager<D, A> diffRequestManager = new DiffRequestManager<>(adapter, tag, PublishRelay.<RxDiffResult>create(), new CompositeDisposable());
+        return diffRequestManager;
     }
 
     /**
@@ -93,123 +120,215 @@ public final class DiffRequestManager {
      * @param diffRequest {@link DiffRequest} holding all parameters to start the difference calculation.
      * @return {@link Single}.
      */
-    private static Single<RxDiffResult> single(@NonNull final DiffRequest diffRequest) {
+    static Single<RxDiffResult> single(@NonNull final DiffRequest diffRequest) {
         return Single.fromCallable(new Callable<RxDiffResult>() {
             @Override
             public RxDiffResult call() throws Exception {
                 final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffRequest.getDiffCallback(), diffRequest.isDetectingMoves());
                 return new RxDiffResult(diffRequest.getTag(), diffResult);
             }
-        });
-    }
-
-    /**
-     * Adds a new {@link DiffRequest} to the pending list.
-     *
-     * @param diffRequest A new {@link DiffRequest}.
-     *                    Note: if a request with the same tag is already exists it will be replaced.
-     */
-    void addPendingRequest(@NonNull final DiffRequest diffRequest) {
-        checkNotNull(diffRequest, "diffRequest must not be null!");
-        mPendingRequests.put(diffRequest.getTag(), diffRequest);
-    }
-
-    /**
-     * Starts the pending request which matches the given tag.
-     * If the request contains {@link DefaultDiffCallback} or its subclass the request will be handled automatically.
-     *
-     * @param tag {@link String} identifying the pending request.
-     * @return {@link Single}.
-     */
-    @NonNull
-    Single<RxDiffResult> execute(@NonNull final String tag) {
-        checkNotNull(tag, "tag string must not be null!");
-        checkArgument(!tag.isEmpty(), "tag string must not be empty!");
-
-        final DiffRequest diffRequest = mPendingRequests.get(tag);
-        if (diffRequest == null) {
-            throw new IllegalArgumentException("There is no pending request for the specified tag!");
-        }
-
-        // Remove pending request
-        mPendingRequests.remove(tag);
-
-        // Remove the current subscription for the request with the same tag
-        dispose(tag);
-
-        final Single<RxDiffResult> diffResultSingle = single(diffRequest)
+        })
                 .cache()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
 
-        // Check whether we should subscribe to the single here
-        if (diffRequest.getDiffCallback() instanceof DefaultDiffCallback) {
-            final DefaultDiffCallback defaultDiffCallback = (DefaultDiffCallback) diffRequest.getDiffCallback();
-            final Disposable disposable = diffResultSingle
-                    .subscribe(new DiffResultSubscriber(defaultDiffCallback));
+    @Override
+    public void receive(@NonNull RxDiffResult rxDiffResult) {
+        update(rxDiffResult.getDiffResult());
 
-            registerDisposable(disposable, diffRequest.getTag());
+        if (mRelay.hasObservers()) {
+            mRelay.accept(rxDiffResult);
+        } else {
+            mCachedResultForSubscription = rxDiffResult;
         }
-
-        return diffResultSingle;
     }
 
     /**
-     * Clears all current pending requests and disposes all current subscriptions.
+     * @return The {@link Observable} you can subscribe to to receive the {@link RxDiffResult}.
+     */
+    @NonNull
+    public Observable<RxDiffResult> diffResults() {
+        Observable<RxDiffResult> cachedResult;
+        if (mCachedResultForSubscription != null) {
+            final RxDiffResult rxDiffResult = mCachedResultForSubscription;
+            cachedResult = Observable.fromCallable(new Callable<RxDiffResult>() {
+                @Override
+                public RxDiffResult call() throws Exception {
+                    return rxDiffResult;
+                }
+            });
+            mCachedResultForSubscription = null;
+        } else {
+            cachedResult = Observable.empty();
+        }
+        return mRelay.hide()
+                .startWith(cachedResult);
+    }
+
+    /**
+     * Updates data and visual representation of the adapter if the setNewData and the adapter is not null.
+     *
+     * @param diffResult The result of the difference calculation.
+     * @throws NullPointerException  If the diffResult is null.
+     * @throws IllegalStateException If the current thread is not main thread.
+     */
+    @UiThread
+    void update(@NonNull final DiffUtil.DiffResult diffResult) {
+        checkNotNull(diffResult, "diffResult must not be null!");
+        assertMainThread("The diff result must be obtained on the main thread");
+
+        if (mCurrentDiffRequest == null) {
+            return;
+        }
+
+        final List<D> newData = mCurrentDiffRequest.getNewData();
+        if (newData == null) {
+            return;
+        }
+
+        final A adapter = mAdapterWeakRef.get();
+        if (adapter == null) {
+            mPendingResult = diffResult;
+            return;
+        }
+
+        // Update data
+        adapter.swapData(newData);
+
+        // Update visual representation
+        diffResult.dispatchUpdatesTo(adapter);
+
+        // Clear all pending data
+        mCurrentDiffRequest = null;
+        mPendingResult = null;
+    }
+
+    /**
+     * Starts building the {@link DiffRequest}.
+     *
+     * @param callback The {@link DiffUtil.Callback} for the diff request.
+     * @return The {@link DiffRequestBuilder}.
+     */
+    @SuppressWarnings("WeakerAccess")
+    @NonNull
+    public DiffRequestBuilder<D> newDiffRequestWith(@NonNull final DiffUtil.Callback callback) {
+        checkNotNull(callback, "callback must not be null!");
+        return DiffRequestBuilder.create(this, callback);
+    }
+
+    /**
+     * Starts the difference calculation in accordance with the parameters defines in the given diff request.
+     *
+     * @param diffRequest {@link DiffRequest} containing parameters for the diff calculation.
+     * @throws NullPointerException If the given diff request is null.
+     */
+    @Override
+    public void execute(@NonNull final DiffRequest<D> diffRequest) {
+        checkNotNull(diffRequest, "diffRequest string must not be null!");
+
+        mCurrentDiffRequest = diffRequest;
+
+        // Unsubscribe the previous subscription
+        mCompositeDisposable.clear();
+
+        mCompositeDisposable.add(single(diffRequest)
+                .subscribe(new DiffResultSubscriber(this)));
+    }
+
+    /**
+     * Clears all current subscriptions.
      */
     void releaseResources() {
-        mPendingRequests.clear();
-        mCurrentSubscriptions.clear();
         mCompositeDisposable.clear();
     }
 
     /**
-     * Stores {@link Disposable} reference so that it can be retrieved later using the given tag.
+     * Replaces the adapter (e.g., after the configuration changes).
      *
-     * @param disposable {@link Disposable}
-     * @param tag        A {@link String} representing the tag the given disposable is associated with.
+     * @param adapter The new recycler view adapter reference.
      */
-    private void registerDisposable(@NonNull final Disposable disposable, @NonNull final String tag) {
-        mCompositeDisposable.add(disposable);
-        mCurrentSubscriptions.put(tag, disposable);
+    @SuppressWarnings("WeakerAccess")
+    public void swapAdapter(@Nullable final A adapter) {
+        this.mAdapterWeakRef = new WeakReference<>(adapter);
+        updateAdapterIfNeeded();
     }
 
     /**
-     * Disposes the {@link Disposable} according to the given tag if the subscription is still in progress.
-     *
-     * @param tag A {@link String} identifying the diff request.
+     * Dispatches the updates to the adapter if there is a pending result.
      */
-    private void dispose(@NonNull final String tag) {
-        final Disposable disposableForTag = mCurrentSubscriptions.get(tag);
-
-        // Check if the subscription is still in progress, if so then dispose the disposable
-        if (disposableForTag != null) {
-            mCurrentSubscriptions.remove(tag);
-            mCompositeDisposable.remove(disposableForTag);
+    void updateAdapterIfNeeded() {
+        if (mPendingResult != null) {
+            update(mPendingResult);
         }
     }
 
     /**
-     * @return A map holding all pending requests. Note: the returned map is unmodifiable.
+     * @return The adapter or null if it was destroyed due to a configuration change.
      */
+    @Nullable
+    A getAdapter() {
+        return this.mAdapterWeakRef.get();
+    }
+
+    /**
+     * @return A tag string.
+     */
+    @SuppressWarnings("WeakerAccess")
     @NonNull
-    Map<String, DiffRequest> getPendingRequests() {
-        return Collections.unmodifiableMap(mPendingRequests);
+    @Override
+    public String getTag() {
+        return mTag;
+    }
+
+    /**
+     * Returns the pending {@link DiffUtil.DiffResult} which is saved when the calculation was completed during a configuration change.
+     *
+     * @return {@link DiffUtil.DiffResult}.
+     */
+    @Nullable
+    DiffUtil.DiffResult getPendingResult() {
+        return mPendingResult;
+    }
+
+    /**
+     * Sets the pending result to update the adapter later.
+     *
+     * @param pendingResult {@link DiffUtil.DiffResult}.
+     */
+    void setPendingResult(@Nullable DiffUtil.DiffResult pendingResult) {
+        mPendingResult = pendingResult;
+    }
+
+    @Nullable
+    RxDiffResult getCachedResultForSubscription() {
+        return mCachedResultForSubscription;
+    }
+
+    void setCachedResultForSubscription(@Nullable RxDiffResult cachedResultForSubscription) {
+        mCachedResultForSubscription = cachedResultForSubscription;
+    }
+
+    @Nullable
+    DiffRequest<D> getCurrentDiffRequest() {
+        return mCurrentDiffRequest;
+    }
+
+    void setCurrentDiffRequest(@Nullable DiffRequest<D> currentDiffRequest) {
+        mCurrentDiffRequest = currentDiffRequest;
     }
 
     /**
      * The class used to handle {@link RxDiffResult} obtained from {@link Single}.
      */
-    private static final class DiffResultSubscriber implements BiConsumer<RxDiffResult, Throwable> {
+    @SuppressWarnings("WeakerAccess")
+    static final class DiffResultSubscriber implements BiConsumer<RxDiffResult, Throwable> {
         @NonNull
-        private final DefaultDiffCallback mDefaultDiffCallback;
+        private final WeakReference<DiffResultReceiver> mDiffResultReceiverWeakRef;
 
-        /**
-         * @param defaultDiffCallback {@link DefaultDiffCallback} instance or its subclass the {@link android.support.v7.util.DiffUtil.DiffResult} will be passed to.
-         */
-        DiffResultSubscriber(@NonNull final DefaultDiffCallback defaultDiffCallback) {
-            checkNotNull(defaultDiffCallback, "defaultDiffCallback must not be null!");
-            this.mDefaultDiffCallback = defaultDiffCallback;
+        DiffResultSubscriber(@NonNull final DiffResultReceiver diffResultReceiver) {
+            checkNotNull(diffResultReceiver, "diffResultReceiver must not be null!");
+            mDiffResultReceiverWeakRef = new WeakReference<>(diffResultReceiver);
         }
 
         @Override
@@ -225,7 +344,10 @@ public final class DiffRequestManager {
                 throw new IllegalStateException("rxDiffResult must not be null if the throwable is null too");
             }
 
-            mDefaultDiffCallback.update(rxDiffResult.getDiffResult());
+            final DiffResultReceiver diffResultReceiver = mDiffResultReceiverWeakRef.get();
+            if (diffResultReceiver != null) {
+                diffResultReceiver.receive(rxDiffResult);
+            }
         }
     }
 }

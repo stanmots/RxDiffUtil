@@ -22,34 +22,20 @@
  * SOFTWARE.
  */
 
-package com.stolets.rxdiffutil;
+package com.stolets.rxdiffutil.diffrequest;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
-import com.stolets.rxdiffutil.diffrequest.DiffRequestManagerHolder;
-import com.stolets.rxdiffutil.diffrequest.DiffRequestManagerHolderRetriever;
-
-import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
+import com.stolets.rxdiffutil.RxDiffResult;
 
 /**
- * Represents an entry point for making diff requests.
+ * Defines the method used to handle the {@link RxDiffResult}.
  */
-@SuppressWarnings("WeakerAccess")
-public final class RxDiffUtil {
-    private RxDiffUtil() {
-    }
-
+interface DiffResultReceiver {
     /**
-     * Creates the retained fragment that is used to listen to the given activity lifecycle events.
-     *
-     * @param activity The {@link Activity} the diff requests lifecycle will be bound to.
-     * @return The {@link DiffRequestManagerHolder} retrieved from the retained fragment.
-     * @throws NullPointerException If the given activity is null.
+     * Handles the {@link RxDiffResult}.
+     * @param rxDiffResult The result obtained from the diff calculation.
      */
-    @NonNull
-    public static DiffRequestManagerHolder bindTo(@NonNull final Activity activity) {
-        checkNotNull(activity, "activity must not be null!");
-        return DiffRequestManagerHolderRetriever.retrieveFrom(activity);
-    }
+    void receive(@NonNull final RxDiffResult rxDiffResult);
+
 }
