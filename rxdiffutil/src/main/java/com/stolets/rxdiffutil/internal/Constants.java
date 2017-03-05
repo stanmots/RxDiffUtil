@@ -24,16 +24,16 @@
 
 package com.stolets.rxdiffutil.internal;
 
-import com.stolets.rxdiffutil.diffrequest.DiffRequest;
+import com.stolets.rxdiffutil.diffrequest.DiffRequestManager;
 
 /**
  * Global project constants.
  */
 public final class Constants {
     /**
-     * The default tag used to identify {@link DiffRequest}.
+     * The default tag used to identify {@link DiffRequestManager}.
      */
-    public static final String DIFF_REQUEST_DEFAULT_TAG = "DIFF_REQUEST_DEFAULT_TAG";
+    public static final String DIFF_REQUEST_MANAGER_DEFAULT_TAG = "DIFF_REQUEST_MANAGER_DEFAULT_TAG";
 
     /**
      * The tag which identifies the retained fragment used to listen to the given {@link android.app.Activity} lifecycle.
