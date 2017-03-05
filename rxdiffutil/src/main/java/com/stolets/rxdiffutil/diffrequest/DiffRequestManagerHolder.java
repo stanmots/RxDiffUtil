@@ -114,7 +114,6 @@ public final class DiffRequestManagerHolder {
     /**
      * Retrieves the {@link DiffRequestManager} from the manager map in accordance with the given tag.
      * <p>
-     * <p>
      * Note: Do not use the manager returned from this method to update the adapter.
      * </p>
      *

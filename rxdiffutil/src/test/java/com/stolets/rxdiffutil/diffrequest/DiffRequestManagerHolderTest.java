@@ -139,7 +139,7 @@ public class DiffRequestManagerHolderTest extends BaseTest {
         mDiffRequestManagerHolder.with(mTestAdapter, TEST_TAG);
 
         // Then
-        then(diffRequestManager).should().swapAdapter(mTestAdapter);
+        then(spyDiffRequestManage).should().swapAdapter(mTestAdapter);
     }
 
     @Test
@@ -155,13 +155,12 @@ public class DiffRequestManagerHolderTest extends BaseTest {
 
     @Test
     public void configurationChanged_ClearsCurrentAdapters() {
-        // Given holder
+        // Given the holder
 
         // When
         mDiffRequestManagerHolder.configurationChanged();
 
         // Then
         then(mDiffRequestManager).should().swapAdapter(null);
-
     }
 }
