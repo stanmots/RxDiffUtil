@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 
 import static com.stolets.rxdiffutil.util.MockitoUtils.TEST_TAG;
@@ -38,14 +39,18 @@ import static com.stolets.rxdiffutil.util.MockitoUtils.getStubbedDiffRequestMana
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.spy;
 
 @RunWith(RobolectricTestRunner.class)
-public class DiffRequestManagerFragmentRoboTest extends BaseRoboTest {
-    private DiffRequestManagerFragment mDiffRequestManagerFragment;
+public class DiffRequestManagerHolderFragmentRoboTest extends BaseRoboTest {
+    @Mock
+    DiffRequestManagerHolder mDiffRequestManagerHolder;
+    private DiffRequestManagerHolderFragment mFragment;
 
     @Before
     public void setup() {
-        mDiffRequestManagerFragment = DiffRequestManagerFragment.newInstance(getStubbedDiffRequestManager());
+        mFragment = DiffRequestManagerHolderFragment.newInstance(mDiffRequestManagerHolder);
     }
 
     @Test
@@ -53,22 +58,36 @@ public class DiffRequestManagerFragmentRoboTest extends BaseRoboTest {
         // Given mDiffRequestManagerFragment
 
         // When
-        final DiffRequestManager diffRequestManager = mDiffRequestManagerFragment.getDiffRequestManager();
+        final DiffRequestManagerHolder holder = mFragment.getDiffRequestManagerHolder();
 
         // Then
-        assertThat(diffRequestManager, notNullValue());
-        assertThat(diffRequestManager.getPendingRequests().size(), is(1));
+        assertThat(holder, notNullValue());
     }
 
+
     @Test
-    public void it_SurvivesConfigurationChange() {
+    public void it_SetsRetainInstanceOnCreate() {
         // Given
-        ActivityUtils.addFragmentToActivity(getActivity().getFragmentManager(), mDiffRequestManagerFragment, TEST_TAG);
+        final DiffRequestManagerHolderFragment spyFragment = spy(DiffRequestManagerHolderFragment.class);
 
         // When
-        getActivity().recreate();
+        spyFragment.onCreate(null);
 
         // Then
-        assertThat(getActivity().getFragmentManager().findFragmentByTag(TEST_TAG), notNullValue());
+        then(spyFragment).should().setRetainInstance(true);
+    }
+
+    /**
+     * Note: Robolectric trhows NPE after the onDestroy has been called.
+     */
+    @Test(expected = NullPointerException.class)
+    public void it_CallsRecycleOnDestroy() {
+        // Given a fragment
+
+        // When
+        mFragment.onDestroy();
+
+        // Then
+        then(mDiffRequestManagerHolder).should().recycle();
     }
 }

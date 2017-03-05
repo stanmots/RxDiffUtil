@@ -69,7 +69,7 @@ ext.deps = [
         // - Other
         rxJava          : "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
         rxAndroid       : "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion",
-        rxRelay        : "com.jakewharton.rxrelay2:rxrelay:$rxRelayVersion",
+        rxRelay         : "com.jakewharton.rxrelay2:rxrelay:$rxRelayVersion",
 
         // testCompile
         junit           : "junit:junit:$junitVersion",

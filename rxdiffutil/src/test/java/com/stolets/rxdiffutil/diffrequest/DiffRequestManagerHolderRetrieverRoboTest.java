@@ -36,12 +36,12 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import static com.stolets.rxdiffutil.util.MockitoUtils.TEST_TAG;
+import static net.trajano.commons.testing.UtilityClassTestUtil.assertUtilityClassWellDefined;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
 @RunWith(RobolectricTestRunner.class)
-
-public class DiffRequestManagerRetrieverRoboTest extends BaseRoboTest {
+public class DiffRequestManagerHolderRetrieverRoboTest extends BaseRoboTest {
     private FragmentManager mFragmentManager;
     private Fragment mFragment;
 
@@ -52,14 +52,19 @@ public class DiffRequestManagerRetrieverRoboTest extends BaseRoboTest {
     }
 
     @Test
-    public void findOrCreateManager_ReturnsNonNullManager() {
+    public void it_IsUtilityClass() throws Exception {
+        assertUtilityClassWellDefined(DiffRequestManagerHolderRetriever.class);
+    }
+
+    @Test
+    public void retrieveFrom_ReturnsNonNullHolder() {
         // Given
         ActivityUtils.addFragmentToActivity(mFragmentManager, mFragment, TEST_TAG);
 
         // When
-        final DiffRequestManager diffRequestManager = DiffRequestManagerRetriever.findOrCreateManager(getActivity());
+        final DiffRequestManagerHolder diffRequestManagerHolder = DiffRequestManagerHolderRetriever.retrieveFrom(getActivity());
 
         // Then
-        assertThat(diffRequestManager, notNullValue());
+        assertThat(diffRequestManagerHolder, notNullValue());
     }
 }

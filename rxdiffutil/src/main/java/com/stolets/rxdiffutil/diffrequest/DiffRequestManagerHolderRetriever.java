@@ -35,33 +35,36 @@ import com.stolets.rxdiffutil.util.SupportActivityUtils;
 import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
 /**
- * The class used to retrieve the diff request manager from the retained fragment.
+ * The class used to retrieveFrom the diff request manager holder from the retained fragment.
  */
-final class DiffRequestManagerRetriever {
-    private DiffRequestManagerRetriever() {}
+public final class DiffRequestManagerHolderRetriever {
+    private DiffRequestManagerHolderRetriever() {}
 
     /**
-     * Determines the activity type (system or from the support library) and retrieves the {@link DiffRequestManager} from the appropriate retained fragment.
-     * @param activity {@link Activity} request lifecycle is bound to.
-     * @return {@link DiffRequestManager}.
+     * Retrieves the {@link DiffRequestManagerHolder} from the retained fragment.
+     *
+     * @param activity The {@link Activity} the requests lifecycle will be bound to.
+     * @return {@link DiffRequestManagerHolder}.
+     *
+     * @throws NullPointerException If the given activity is null.
      */
     @NonNull
-    static DiffRequestManager retrieve(@NonNull final Activity activity) {
+    public static DiffRequestManagerHolder retrieveFrom(@NonNull final Activity activity) {
         checkNotNull(activity, "activity must not be null");
-        return findOrCreateManager(activity);
+        return findOrCreateHolder(activity);
     }
 
     @NonNull
-    static DiffRequestManager findOrCreateManager(@NonNull final Activity activity) {
+    static DiffRequestManagerHolder findOrCreateHolder(@NonNull final Activity activity) {
         if (activity instanceof AppCompatActivity) {
             final AppCompatActivity compatActivity = (AppCompatActivity) activity;
-            return ((SupportDiffRequestManagerFragment) SupportActivityUtils.
+            return ((SupportDiffRequestManagerHolderFragment) SupportActivityUtils.
                     findOrCreateSupportFragment(compatActivity.getSupportFragmentManager(), Constants.RETAINED_FRAGMENT_TAG)).
-                    getDiffRequestManager();
+                    getDiffRequestManagerHolder();
         } else {
-            return ((DiffRequestManagerFragment) ActivityUtils.
+            return ((DiffRequestManagerHolderFragment) ActivityUtils.
                     findOrCreateFragment(activity.getFragmentManager(), Constants.RETAINED_FRAGMENT_TAG)).
-                    getDiffRequestManager();
+                    getDiffRequestManagerHolder();
         }
     }
 }

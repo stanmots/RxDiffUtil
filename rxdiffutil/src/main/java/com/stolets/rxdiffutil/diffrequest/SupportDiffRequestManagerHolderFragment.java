@@ -33,49 +33,50 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 
 
 /**
- * The view-less retained fragment that is used to hold {@link DiffRequestManager}.
+ * The view-less retained fragment that is used to hold {@link DiffRequestManagerHolder}.
  */
-public class SupportDiffRequestManagerFragment extends Fragment {
-    private DiffRequestManager mDiffRequestManager;
+public class SupportDiffRequestManagerHolderFragment extends Fragment {
+    @Nullable
+    private DiffRequestManagerHolder mDiffRequestManagerHolder;
 
-    public static SupportDiffRequestManagerFragment newInstance(@NonNull final DiffRequestManager diffRequestManager) {
-        final SupportDiffRequestManagerFragment supportDiffRequestManagerFragment = new SupportDiffRequestManagerFragment();
-        supportDiffRequestManagerFragment.setDiffRequestManager(diffRequestManager);
-        return supportDiffRequestManagerFragment;
+    public static SupportDiffRequestManagerHolderFragment newInstance(@NonNull final DiffRequestManagerHolder diffRequestManagerHolder) {
+        final SupportDiffRequestManagerHolderFragment fragment = new SupportDiffRequestManagerHolderFragment();
+        fragment.setDiffRequestManagerHolder(diffRequestManagerHolder);
+        return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-        // If the process was killed
-        if (mDiffRequestManager == null) {
-            mDiffRequestManager = new DiffRequestManager();
-        }
     }
 
     @Override
     public void onDestroy() {
-        mDiffRequestManager.releaseResources();
+        getDiffRequestManagerHolder().recycle();
         super.onDestroy();
     }
 
     /**
-     * @return {@link DiffRequestManager} instance.
+     * @return {@link DiffRequestManagerHolder} instance.
+     * @throws IllegalStateException If the holder is null.
      */
     @NonNull
-    public DiffRequestManager getDiffRequestManager() {
-        return mDiffRequestManager;
+    public DiffRequestManagerHolder getDiffRequestManagerHolder() {
+        if (mDiffRequestManagerHolder == null) {
+            throw new IllegalStateException("The DiffRequestManagerHolder must not be null. Ensure that you are initializing the fragment using newInstance() method");
+        }
+
+        return mDiffRequestManagerHolder;
     }
 
     /**
-     * Used to inject {@link DiffRequestManager}.
+     * Used to inject {@link DiffRequestManagerHolder}.
      *
-     * @param diffRequestManager {@link DiffRequestManager}.
+     * @param diffRequestManagerHolder {@link DiffRequestManagerHolder}.
      */
-    public void setDiffRequestManager(@NonNull final DiffRequestManager diffRequestManager) {
-        checkNotNull(diffRequestManager, "diffRequestManager must not be null!");
-        this.mDiffRequestManager = diffRequestManager;
+    public void setDiffRequestManagerHolder(@NonNull final DiffRequestManagerHolder diffRequestManagerHolder) {
+        checkNotNull(diffRequestManagerHolder, "diffRequestManagerHolder must not be null!");
+        this.mDiffRequestManagerHolder = diffRequestManagerHolder;
     }
 }
