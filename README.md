@@ -11,7 +11,7 @@ RxDiffUtil is a lightweight Rx wrapper around [DiffUtil](https://developer.andro
 
 Under the hood it automates a lot of things, such as background processing of multiple [calculateDiff](<https://developer.android.com/reference/android/support/v7/util/DiffUtil.html#calculateDiff(android.support.v7.util.DiffUtil.Callback, boolean)>) operations, binding to `Activity` lifecycle (`AppCompatActivity` is also supported), automatic `RecyclerView.Adapter` updating etc.
 
-You do not need to be an expert of [RxJava](https://github.com/ReactiveX/RxJava). It is possible to handle the difference calculations with just one line of code. Really! :metal::tada:
+The library is fully compatible with [RxJava2](https://github.com/ReactiveX/RxJava). It's very flexible -  you can configure it very easily to suit your needs. :metal::tada:
 
 ****
 
@@ -23,7 +23,7 @@ You do not need to be an expert of [RxJava](https://github.com/ReactiveX/RxJava)
 * Gradle 
 
 ```groovy
-compile 'io.github.storix:rxdiffutil:0.2.1'
+compile 'io.github.storix:rxdiffutil:0.3.0'
 ```
 
 * Maven
@@ -32,14 +32,14 @@ compile 'io.github.storix:rxdiffutil:0.2.1'
 <dependency>
   <groupId>io.github.storix</groupId>
   <artifactId>rxdiffutil</artifactId>
-  <version>0.2.1</version>
+  <version>0.3.0</version>
   <type>pom</type>
 </dependency>
 ```
 
 * Ivy
 ```xml
-<dependency org='io.github.storix' name='rxdiffutil' rev='0.2.1'>
+<dependency org='io.github.storix' name='rxdiffutil' rev='0.3.0'>
   <artifact name='rxdiffutil' ext='pom' ></artifact>
 </dependency>
 ```
@@ -105,81 +105,107 @@ And here is the next tool that comes to our rescue: **RxDiffUtil**.
 
 
 ### Usage
-Basically, there are two ways you can choose:
 
-
-##### 1. Everything is managed automatically
-Let's take a look at the basic example:
+##### 1. If you want to update the adapter manually
+First set the binding in your `Activity`'s `onCreate`:
 
 ```java
-RxDiffUtil.with(new DefaultDiffCallback<>(oldList, newList, adapter))
-          .detectMoves(true)
-          .bindTo(activity)
-          .calculate();
+private DiffRequestManager mDiffRequestManager;
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        // The manager can be injected using Dagger
+        mDiffRequestManager = RxDiffUtil
+                                .bindTo(this)
+                                .getDefaultManager();
+                                
+        mCompositeDisposable.add(mDiffRequestManager
+                                .diffResults()
+                                .subscribe( rxDiffResult -> {
+                                     // Update your adapter here
+                                     // Note: If the diff calculation was finished when the activity has been destroyed this method will be called as soon as the new activity is created
+                                });                             
+}
 ```
 
-There are just a couple of things to note here.
 
-* The lists that are passed to [DefaultDiffCallback](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/DefaultDiffCallback.java)
-must hold the data model which implements [Identifiable](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/Identifiable.java) interface. This interface is required to provide the proper unique identifiers of the compared items. [Here](https://github.com/storix/RxDiffUtil/blob/master/sample/src/main/java/com/stolets/rxdiffutillib/SampleModel.java#L25) is the sample implementation.
+Then, when the new data has been received, call the following:
+
+
+```java
+// At this point you have received the new data (possibly using some async request)
+mDiffRequestManager
+                   .newDiffRequestWith(diffCallback)
+                   .detectMoves(true)
+                   .calculate();
+```
+
+You can use [DefaultDiffCallback](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/DefaultDiffCallback.java) as a helper to create the diff callback:
+
+```java
+.newDiffRequestWith(new DefaultDiffCallback<>(adapter.getCurrentData(), newData))
+```
+
+The lists that are passed to the default callback must hold the data model which implements [Identifiable](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/Identifiable.java) interface. This interface is required to provide the proper unique identifiers of the compared items. [Here](https://github.com/storix/RxDiffUtil/blob/master/sample/src/main/java/com/stolets/rxdiffutillib/SampleModel.java#L25) is the sample implementation.
+
+
+If you need to update just one `RecyclerView.Adapter` than that's it. When `Activity` is finished all resources will be disposed; when you call `calculate()` the previous operation is cancelled automatically; the main thread won't be blocked.
+
+##### 2. If you want the adapter to be updated automatically
 
 * The adapter must implement [Swappable](https://github.com/storix/RxDiffUtil/blob/master/rxdiffutil/src/main/java/com/stolets/rxdiffutil/Swappable.java) interface. This is required to update data source and notify adapter at the appropriate time. [Here](https://github.com/storix/RxDiffUtil/blob/master/sample/src/main/java/com/stolets/rxdiffutillib/SampleAdapter.java#L60) is the sample implementation.
 
-If you need to update just one `RecyclerView.Adapter` than that's it. You should not worry about anything: adapter is updated automatically; when `Activity` is finished all resources will be disposed; when you call `calculate()` the previous operation is cancelled automatically; the main thread won't be blocked.
-
-If you need to be notified when the diff calculation is complete just subscribe to it:
+* Pass the adapter when creating the binding:
 
 ```java
-		  ...
-          .calculate()
-          .subscribe(rxDiffResult -> Log.d(TAG, "Diff calculation is complete"); )
-```
+private DiffRequestManager<YourModelType, YourAdapterType> mDiffRequestManager;
+  
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+          
+    mDiffRequestManager = RxDiffUtil
+                                  .bindTo(this)
+                                  .with(adapter);                            
+}
+  ```
 
-##### 2. Manual approach
-
-If you want you can also pass to `RxDiffUtil.with` your custom `DiffUtil.Callback` implementation. But in this case `RecyclerView.Adapter` and data source won't be updated automatically. You will need to do that manually in your subscription callback.
+* And when the new data arrived:
 
 ```java
-		  ...
-          .subscribe(rxDiffResult -> {
-          		Log.d(TAG, "Diff calculation is complete");
-
-                // swap the list with the new one
-                mAdapter.setData(newList);
-                // then dispatch all updates to the RecyclerView
-     			rxDiffResult.getDiffResult()
-     				.dispatchUpdatesTo(mAdapter);
-			});
+mDiffRequestManager
+                   .newDiffRequestWith(diffCallback)
+                   .updateAdapterWithNewData(newData)
+                   .detectMoves(true)
+                   .calculate();
 ```
 
-The resources are disposed when `Activity` is finished in both
-approaches.
+`updateAdapterWithNewData` will notify the adapter asynchronously when the diff calculation has been finished even after the configuration change.
 
 ### Activity with multiple recycler views
 
-If you have `Activity` which contains multiple `RecyclerView`s then you must also supply unique tags for each diff calculation operation requested for different `RecyclerView`. This is required to correctly find and cancel a previous request.
+If you have `Activity` which contains multiple `RecyclerView`s then you must also supply unique tags for each diff calculation operation requested for different `RecyclerView`. This is required to correctly find and cancel a previous request and also allows to distinguish between the diff results in case you decide to merge the observables.
 
 For example, consider there are two `RecyclerView`s and we need to calculate the difference for each one at the different points of our app's lifecycle. All you need to do in such situation is to attach different tags for each request:
 
 ```java
-// Request for RecyclerView1
-RxDiffUtil.with(new DefaultDiffCallback<>(oldList, newList, adapter1))
-          .tag("RECYCLER_VIEW1_TAG")
-          .detectMoves(true)
-          .bindTo(activity)
-          .calculate();
+// Configure the first adapter binding
+mDiffRequestManager1 = RxDiffUtil
+                                .bindTo(this)
+                                .with(adapter, "ADAPTER_TAG1");  
 
-// Another request for RecyclerView2
-RxDiffUtil.with(new DefaultDiffCallback<>(oldList, newList, adapter2))
-          .tag("RECYCLER_VIEW2_TAG")
-          .detectMoves(true)
-          .bindTo(activity)
-          .calculate();
+// Configure the second adapter binding
+mDiffRequestManager2 = RxDiffUtil
+                                .bindTo(this)
+                                .with(adapter, "ADAPTER_TAG2");
 ```
 
 ### Thanks
 
-* [CodePath](https://codepath.com/about) team for the amazing Android tutorials.
+* [RxJava](https://github.com/ReactiveX/RxJava) team
+* [CodePath](https://codepath.com/about) team for the amazing Android tutorials
 
 
 ### LICENSE
