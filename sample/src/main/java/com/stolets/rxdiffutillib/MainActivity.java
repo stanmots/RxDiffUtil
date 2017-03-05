@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.stolets.rxdiffutil.DefaultDiffCallback;
 import com.stolets.rxdiffutil.RxDiffResult;
 import com.stolets.rxdiffutil.RxDiffUtil;
+import com.stolets.rxdiffutil.diffrequest.DiffRequestManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,9 +30,9 @@ import io.reactivex.functions.Consumer;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int UPDATE_TIME_IN_SECONDS = 10;
-    private List<SampleModel> mSampleModelList;
     private List<SampleModel> mUpdatedSampleModelList;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private DiffRequestManager<SampleModel, SampleAdapter> mDiffRequestManager;
 
     private int counter = UPDATE_TIME_IN_SECONDS;
 
@@ -50,18 +51,32 @@ public class MainActivity extends AppCompatActivity {
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.sample_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        mSampleModelList = new ArrayList<>();
         mUpdatedSampleModelList = new ArrayList<>();
 
-        mSampleAdapter = new SampleAdapter(mSampleModelList);
+        mSampleAdapter = new SampleAdapter();
         recyclerView.setAdapter(mSampleAdapter);
+
+        // The request manager can be injected using Dagger
+        mDiffRequestManager = RxDiffUtil
+                .bindTo(this)
+                .with(mSampleAdapter);
+
+        mCompositeDisposable.add(mDiffRequestManager
+                .diffResults()
+                .subscribe(new Consumer<RxDiffResult>() {
+                    @Override
+                    public void accept(@NonNull RxDiffResult rxDiffResult) throws Exception {
+                        Log.d(TAG, "Diff calculations completed successfully!");
+                        setUpdateCompleteState();
+                    }
+                }));
 
         restartAdapterUpdating();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
         mCompositeDisposable.clear();
     }
 
@@ -90,18 +105,12 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() throws Exception {
                         Log.d(TAG, "New sample model list has been generated successfully!");
-
-                        RxDiffUtil.with(new DefaultDiffCallback<>(mSampleModelList, mUpdatedSampleModelList, mSampleAdapter))
+                        mDiffRequestManager
+                                .newDiffRequestWith(
+                                        new DefaultDiffCallback<>(mSampleAdapter.getSampleModelList(), mUpdatedSampleModelList))
+                                .updateAdapterWithNewData(mUpdatedSampleModelList)
                                 .detectMoves(true)
-                                .bindTo(MainActivity.this)
-                                .calculate()
-                                .subscribe(new Consumer<RxDiffResult>() {
-                                    @Override
-                                    public void accept(@NonNull RxDiffResult rxDiffResult) throws Exception {
-                                        Log.d(TAG, "Diff calculation is complete");
-                                        setUpdateCompleteState();
-                                    }
-                                });
+                                .calculate();
                     }
                 }));
     }
@@ -109,17 +118,13 @@ public class MainActivity extends AppCompatActivity {
     private void resetToInitialState() {
         // Reset everything to the initial state
         counter = UPDATE_TIME_IN_SECONDS;
-        mCompositeDisposable.clear();
 
         mCounterTextView.setVisibility(View.VISIBLE);
         mRestartButton.setVisibility(View.GONE);
 
-        mSampleModelList.clear();
         mUpdatedSampleModelList.clear();
 
-        mSampleModelList.addAll(createInitialList());
-
-        mSampleAdapter.swapData(mSampleModelList);
+        mSampleAdapter.swapData(createInitialList());
         mSampleAdapter.notifyDataSetChanged();
     }
 

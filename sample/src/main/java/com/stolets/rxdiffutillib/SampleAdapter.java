@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.stolets.rxdiffutil.Swappable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
@@ -17,8 +18,8 @@ public final class SampleAdapter extends RecyclerView.Adapter<SampleAdapter.View
     @NonNull
     private List<SampleModel> mSampleModelList;
 
-    SampleAdapter(@NonNull final List<SampleModel> sampleModelList) {
-        this.mSampleModelList = sampleModelList;
+    SampleAdapter() {
+        mSampleModelList = new ArrayList<>();
     }
 
     @Override
@@ -59,5 +60,10 @@ public final class SampleAdapter extends RecyclerView.Adapter<SampleAdapter.View
     @Override
     public void swapData(@NonNull final List<SampleModel> updatedList) {
         this.mSampleModelList = updatedList;
+    }
+
+    @NonNull
+    public List<SampleModel> getSampleModelList() {
+        return mSampleModelList;
     }
 }
