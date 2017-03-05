@@ -75,7 +75,7 @@ public final class Preconditions {
      *
      * @throws IllegalStateException if the current thread is not the main thread.
      */
-    public static void ensureMainThread(@Nullable Object errorMessage) {
+    public static void assertMainThread(@Nullable Object errorMessage) {
         if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
             throw new IllegalStateException(String.valueOf(errorMessage));
         }

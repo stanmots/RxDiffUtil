@@ -215,7 +215,7 @@ public final class DiffRequestManager {
         @Override
         @UiThread
         public void accept(@io.reactivex.annotations.NonNull RxDiffResult rxDiffResult, @io.reactivex.annotations.NonNull Throwable throwable) throws Exception {
-            ensureMainThread("The diff result must be obtained on the main thread");
+            assertMainThread("The diff result must be obtained on the main thread");
 
             if (throwable != null && throwable.getMessage() != null) {
                 throw new IllegalStateException("Failed to calculate diff", throwable);
