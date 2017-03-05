@@ -58,6 +58,11 @@ public final class DiffRequestManagerHolder {
 
     /**
      * Forwards the call to {@link DiffRequestManagerHolder#with(RecyclerView.Adapter, String)} with the default tag.
+     *
+     * @param adapter The recycler view adapter.
+     * @param <D>     Data type.
+     * @param <A>     Type of the adapter.
+     * @return {@link DiffRequestManager}.
      */
     @NonNull
     public <D, A extends RecyclerView.Adapter & Swappable<D>> DiffRequestManager<D, A> with(@NonNull final A adapter) {
@@ -98,6 +103,7 @@ public final class DiffRequestManagerHolder {
 
     /**
      * Forwards the call to {@link DiffRequestManagerHolder#getManager(String)}.
+     *
      * @return {@link DiffRequestManager}.
      */
     @NonNull
@@ -107,9 +113,9 @@ public final class DiffRequestManagerHolder {
 
     /**
      * Retrieves the {@link DiffRequestManager} from the manager map in accordance with the given tag.
-     *
      * <p>
-     *     Note: Do not use the manager returned from this method to update the adapter.
+     * <p>
+     * Note: Do not use the manager returned from this method to update the adapter.
      * </p>
      *
      * @param tag The tag string which identifies the {@link DiffRequestManager}.
@@ -145,6 +151,17 @@ public final class DiffRequestManagerHolder {
         checkArgument(!tag.isEmpty(), "tag string must not be empty!");
 
         mDiffRequestManagers.put(tag, manager);
+    }
+
+    /**
+     * Performs additional clean-up when the app configuration has been changed.
+     */
+    void configurationChanged() {
+        for (DiffRequestManager manager : mDiffRequestManagers.values()) {
+            // Clear the adapter since it will be replaced after the activity is recreated
+            //noinspection unchecked
+            manager.swapAdapter(null);
+        }
     }
 
     /**

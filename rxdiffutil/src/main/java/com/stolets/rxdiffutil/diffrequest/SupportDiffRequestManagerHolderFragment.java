@@ -52,6 +52,12 @@ public class SupportDiffRequestManagerHolderFragment extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        getDiffRequestManagerHolder().configurationChanged();
+        super.onDestroyView();
+    }
+
+    @Override
     public void onDestroy() {
         getDiffRequestManagerHolder().recycle();
         super.onDestroy();

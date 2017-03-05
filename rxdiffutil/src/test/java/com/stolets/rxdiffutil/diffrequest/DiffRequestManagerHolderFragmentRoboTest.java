@@ -25,7 +25,6 @@
 package com.stolets.rxdiffutil.diffrequest;
 
 import com.stolets.rxdiffutil.BaseRoboTest;
-import com.stolets.rxdiffutil.util.ActivityUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,10 +33,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 
-import static com.stolets.rxdiffutil.util.MockitoUtils.TEST_TAG;
-import static com.stolets.rxdiffutil.util.MockitoUtils.getStubbedDiffRequestManager;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.spy;
@@ -89,5 +85,17 @@ public class DiffRequestManagerHolderFragmentRoboTest extends BaseRoboTest {
 
         // Then
         then(mDiffRequestManagerHolder).should().recycle();
+    }
+
+    @Test
+    public void onDestroyView_CallsConfigurationChange() {
+        // Given
+        final DiffRequestManagerHolderFragment spyFragment = spy(mFragment);
+
+        // When
+        spyFragment.onDestroyView();
+
+        // Then
+        then(mDiffRequestManagerHolder).should().configurationChanged();
     }
 }

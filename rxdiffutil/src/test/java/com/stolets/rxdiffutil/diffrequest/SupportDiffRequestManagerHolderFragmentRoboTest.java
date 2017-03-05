@@ -84,4 +84,16 @@ public class SupportDiffRequestManagerHolderFragmentRoboTest extends BaseRoboTes
         // Then
         then(mDiffRequestManagerHolder).should().recycle();
     }
+
+    @Test
+    public void onDestroyView_CallsConfigurationChange() {
+        // Given
+        final SupportDiffRequestManagerHolderFragment spyFragment = spy(mFragment);
+
+        // When
+        spyFragment.onDestroyView();
+
+        // Then
+        then(mDiffRequestManagerHolder).should().configurationChanged();
+    }
 }

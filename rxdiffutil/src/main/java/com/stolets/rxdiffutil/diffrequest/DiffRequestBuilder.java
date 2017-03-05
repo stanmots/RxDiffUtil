@@ -66,6 +66,11 @@ public final class DiffRequestBuilder<D> {
 
     /**
      * Forwards the call to {@link DiffRequestBuilder#DiffRequestBuilder(Manager, DiffUtil.Callback)} ensuring type safety.
+     *
+     * @param diffRequestManager {@link DiffRequestManager}.
+     * @param callback           {@link DiffUtil.Callback}.
+     * @param <T>                The type of the data model.
+     * @return {@link DiffRequestBuilder}.
      */
     @NonNull
     public static <T> DiffRequestBuilder<T> create(@NonNull final Manager<T> diffRequestManager,

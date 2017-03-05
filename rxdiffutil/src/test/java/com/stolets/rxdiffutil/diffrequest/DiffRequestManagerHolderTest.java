@@ -131,15 +131,15 @@ public class DiffRequestManagerHolderTest extends BaseTest {
     @Test
     public void with_WhenManagerExists_SwapsAdapter() {
         // Given
-        final DiffRequestManager<TestModel, TestAdapter<TestModel>> diffRequestManage = DiffRequestManager.create(mTestAdapter, TEST_TAG);
-        final DiffRequestManager<TestModel, TestAdapter<TestModel>> spyDiffRequestManage = spy(diffRequestManage);
+        final DiffRequestManager<TestModel, TestAdapter<TestModel>> diffRequestManager = DiffRequestManager.create(mTestAdapter, TEST_TAG);
+        final DiffRequestManager<TestModel, TestAdapter<TestModel>> spyDiffRequestManage = spy(diffRequestManager);
         mDiffRequestManagerHolder.addManager(spyDiffRequestManage, TEST_TAG);
 
         // When
         mDiffRequestManagerHolder.with(mTestAdapter, TEST_TAG);
 
         // Then
-        then(spyDiffRequestManage).should().swapAdapter(mTestAdapter);
+        then(diffRequestManager).should().swapAdapter(mTestAdapter);
     }
 
     @Test
@@ -151,5 +151,17 @@ public class DiffRequestManagerHolderTest extends BaseTest {
 
         // Then
         then(mDiffRequestManager).should().releaseResources();
+    }
+
+    @Test
+    public void configurationChanged_ClearsCurrentAdapters() {
+        // Given holder
+
+        // When
+        mDiffRequestManagerHolder.configurationChanged();
+
+        // Then
+        then(mDiffRequestManager).should().swapAdapter(null);
+
     }
 }
