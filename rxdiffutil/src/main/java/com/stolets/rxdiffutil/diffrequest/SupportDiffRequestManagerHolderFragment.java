@@ -70,7 +70,7 @@ public class SupportDiffRequestManagerHolderFragment extends Fragment {
     @NonNull
     public DiffRequestManagerHolder getDiffRequestManagerHolder() {
         if (mDiffRequestManagerHolder == null) {
-            throw new IllegalStateException("The DiffRequestManagerHolder must not be null. Ensure that you are initializing the fragment using newInstance() method");
+            mDiffRequestManagerHolder = DiffRequestManagerHolder.create();
         }
 
         return mDiffRequestManagerHolder;

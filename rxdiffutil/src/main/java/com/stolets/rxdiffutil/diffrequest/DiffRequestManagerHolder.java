@@ -30,6 +30,7 @@ import android.support.v7.widget.RecyclerView;
 import com.stolets.rxdiffutil.Swappable;
 import com.stolets.rxdiffutil.internal.Constants;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -44,6 +45,15 @@ import static com.stolets.rxdiffutil.internal.Preconditions.checkNotNull;
 public final class DiffRequestManagerHolder {
     @NonNull
     private final Map<String, DiffRequestManager> mDiffRequestManagers;
+
+    /**
+     * Static factory method to create {@link DiffRequestManagerHolder}.
+     * @return {@link DiffRequestManagerHolder}.
+     */
+    @NonNull
+    public static DiffRequestManagerHolder create() {
+        return new DiffRequestManagerHolder(new HashMap<String, DiffRequestManager>());
+    }
 
     /**
      * Constructs a {@link DiffRequestManagerHolder}.
