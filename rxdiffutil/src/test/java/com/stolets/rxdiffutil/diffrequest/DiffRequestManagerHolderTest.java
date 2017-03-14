@@ -70,6 +70,15 @@ public class DiffRequestManagerHolderTest extends BaseTest {
     }
 
     @Test
+    public void create_ReturnsNonNullHolder() {
+        // When
+        final DiffRequestManagerHolder holder = DiffRequestManagerHolder.create();
+
+        // Then
+        assertThat(holder, notNullValue());
+    }
+
+    @Test
     public void getDefaultManager_ReturnsManagerWithDefaultTag() {
         // Given
         given(mDiffRequestManager.getTag()).willReturn(Constants.DIFF_REQUEST_MANAGER_DEFAULT_TAG);
