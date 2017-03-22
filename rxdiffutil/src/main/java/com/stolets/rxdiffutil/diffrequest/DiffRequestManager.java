@@ -152,12 +152,7 @@ public final class DiffRequestManager<D, A extends RecyclerView.Adapter & Swappa
         Observable<RxDiffResult> cachedResult;
         if (mCachedResultForSubscription != null) {
             final RxDiffResult rxDiffResult = mCachedResultForSubscription;
-            cachedResult = Observable.fromCallable(new Callable<RxDiffResult>() {
-                @Override
-                public RxDiffResult call() throws Exception {
-                    return rxDiffResult;
-                }
-            });
+            cachedResult = Observable.just(rxDiffResult);
             mCachedResultForSubscription = null;
         } else {
             cachedResult = Observable.empty();
