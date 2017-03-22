@@ -42,6 +42,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
@@ -74,6 +75,8 @@ public class DiffRequestManagerRoboTest extends BaseRoboTest {
     TestAdapter<TestModel> mTestAdapter;
     @Mock
     CompositeDisposable mCompositeDisposable;
+    @Mock
+    DiffRequestManager.DiffResultSubscriber mDiffResultSubscriber;
     private RxDiffResult mRxDiffResult;
     private DiffRequest<TestModel> mDiffRequest;
     private DiffRequestManager<TestModel, TestAdapter<TestModel>> mDiffRequestManager;
@@ -83,6 +86,7 @@ public class DiffRequestManagerRoboTest extends BaseRoboTest {
         mRxDiffResult = new RxDiffResult(TEST_TAG, mDiffResult);
         mDiffRequest = new DiffRequest<>(true, TEST_TAG, mNewData, mCallback);
         mDiffRequestManager = new DiffRequestManager<>(mTestAdapter, TEST_TAG, PublishRelay.<RxDiffResult>create(), mCompositeDisposable);
+        mDiffRequestManager.setDiffResultSubscriber(mDiffResultSubscriber);
     }
 
     @Test
@@ -123,8 +127,7 @@ public class DiffRequestManagerRoboTest extends BaseRoboTest {
 
             single.subscribe(testObserver);
 
-            // Await because the trampoline queues work to be executed after the current work completes
-            testObserver.awaitTerminalEvent();
+            testObserver.awaitTerminalEvent(500, TimeUnit.MILLISECONDS);
             testObserver.assertValue(new Predicate<RxDiffResult>() {
                 @Override
                 public boolean test(@NonNull RxDiffResult rxDiffResult) throws Exception {

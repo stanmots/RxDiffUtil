@@ -71,6 +71,8 @@ public final class DiffRequestManager<D, A extends RecyclerView.Adapter & Swappa
     private DiffUtil.DiffResult mPendingResult;
     @Nullable
     private RxDiffResult mCachedResultForSubscription;
+    @Nullable
+    private DiffResultSubscriber mDiffResultSubscriber;
 
     /**
      * Constructs a new instance of {@link DiffRequestManager} with injected parameters.
@@ -228,7 +230,7 @@ public final class DiffRequestManager<D, A extends RecyclerView.Adapter & Swappa
         mCompositeDisposable.clear();
 
         mCompositeDisposable.add(single(diffRequest)
-                .subscribe(new DiffResultSubscriber(this)));
+                .subscribe(getDiffResultSubscriber()));
     }
 
     /**
@@ -311,6 +313,21 @@ public final class DiffRequestManager<D, A extends RecyclerView.Adapter & Swappa
 
     void setCurrentDiffRequest(@Nullable DiffRequest<D> currentDiffRequest) {
         mCurrentDiffRequest = currentDiffRequest;
+    }
+
+    @NonNull
+    DiffResultSubscriber getDiffResultSubscriber() {
+        if (mDiffResultSubscriber == null) {
+            mDiffResultSubscriber = new DiffResultSubscriber(this);
+        }
+
+        return mDiffResultSubscriber;
+    }
+
+    void setDiffResultSubscriber(@NonNull DiffResultSubscriber diffResultSubscriber) {
+        checkNotNull(diffResultSubscriber, "diffResultSubscriber must not be null");
+
+        mDiffResultSubscriber = diffResultSubscriber;
     }
 
     /**
