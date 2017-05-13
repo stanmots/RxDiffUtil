@@ -320,7 +320,7 @@ public class DiffRequestManagerRoboTest extends BaseRoboTest {
         final DiffRequestManager.DiffResultSubscriber diffResultSubscriber = new DiffRequestManager.DiffResultSubscriber(spyManager);
 
         // When
-        diffResultSubscriber.accept(mRxDiffResult, new Throwable());
+        diffResultSubscriber.accept(mRxDiffResult, null);
 
         // Then
         then(spyManager).should().receive(mRxDiffResult);
