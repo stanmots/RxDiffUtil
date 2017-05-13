@@ -242,8 +242,11 @@ public final class DiffRequestManager<D, A extends RecyclerView.Adapter & Swappa
 
     /**
      * Replaces the adapter (e.g., after the configuration changes).
+     * <p>
+     * <b>Note:</b> It is assumed that the adapter has restored its old data from {@link android.os.Bundle}.
+     * </p>
      *
-     * @param adapter The new recycler view adapter reference.
+     * @param adapter The new recycler view adapter reference. Can be {@code null} to disable update.
      */
     @SuppressWarnings("WeakerAccess")
     public void swapAdapter(@Nullable final A adapter) {
