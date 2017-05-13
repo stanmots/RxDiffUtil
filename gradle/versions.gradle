@@ -46,7 +46,7 @@ ext {
     robolectricCoreVersion = "3.3.1"
 
     // Plugins versions
-    gradlePluginVersion = "2.3.0"
+    gradlePluginVersion = "2.3.2"
     jacocoAndroidVersion = "0.1.1"
     androidMavenVersion = "1.5"
 }
