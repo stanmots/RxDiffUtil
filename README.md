@@ -9,7 +9,7 @@ RxDiffUtil
 
 RxDiffUtil is a lightweight Rx wrapper around [DiffUtil](https://developer.android.com/reference/android/support/v7/util/DiffUtil.html) from Android support library.
 
-Under the hood it automates a lot of things, such as background processing of multiple [calculateDiff](<https://developer.android.com/reference/android/support/v7/util/DiffUtil.html#calculateDiff(android.support.v7.util.DiffUtil.Callback, boolean)>) operations, binding to `Activity` lifecycle (`AppCompatActivity` is also supported), automatic `RecyclerView.Adapter` updating etc.
+Under the hood it automates a lot of things, such as background processing of multiple [calculateDiff][1] operations, binding to `Activity` lifecycle (`AppCompatActivity` is also supported), automatic `RecyclerView.Adapter` updating etc.
 
 The library is fully compatible with [RxJava2](https://github.com/ReactiveX/RxJava). It's very flexible -  you can configure it very easily to suit your needs. :metal::tada:
 
@@ -215,3 +215,6 @@ MIT License
 Copyright (c) 2017 Stan Mots (Storix)
 
 See the [LICENSE](https://github.com/storix/RxDiffUtil/blob/master/LICENSE) file for details.
+
+[1]: https://goo.gl/fd1hUL
+
