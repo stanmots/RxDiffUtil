@@ -23,7 +23,7 @@ The library is fully compatible with [RxJava2](https://github.com/ReactiveX/RxJa
 * Gradle 
 
 ```groovy
-compile 'io.github.storix:rxdiffutil:0.3.0'
+compile 'io.github.storix:rxdiffutil:0.3.2'
 ```
 
 * Maven
@@ -32,14 +32,14 @@ compile 'io.github.storix:rxdiffutil:0.3.0'
 <dependency>
   <groupId>io.github.storix</groupId>
   <artifactId>rxdiffutil</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.2</version>
   <type>pom</type>
 </dependency>
 ```
 
 * Ivy
 ```xml
-<dependency org='io.github.storix' name='rxdiffutil' rev='0.3.0'>
+<dependency org='io.github.storix' name='rxdiffutil' rev='0.3.2'>
   <artifact name='rxdiffutil' ext='pom' ></artifact>
 </dependency>
 ```
