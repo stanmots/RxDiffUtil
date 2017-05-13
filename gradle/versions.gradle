@@ -25,7 +25,7 @@
 // Variables for entire project
 ext {
     // Library configuration
-    projectVersion = "0.3.1"
+    projectVersion = "0.3.2"
     minSdkVersion = 14
     targetSdkVersion = 25
     compileSdkVersion = 25
