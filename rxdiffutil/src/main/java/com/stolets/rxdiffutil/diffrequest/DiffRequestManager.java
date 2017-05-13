@@ -345,15 +345,15 @@ public final class DiffRequestManager<D, A extends RecyclerView.Adapter & Swappa
 
         @Override
         @UiThread
-        public void accept(@io.reactivex.annotations.NonNull RxDiffResult rxDiffResult, @io.reactivex.annotations.NonNull Throwable throwable) throws Exception {
+        public void accept(RxDiffResult rxDiffResult, Throwable throwable) throws Exception {
             assertMainThread("The diff result must be obtained on the main thread");
 
-            if (throwable != null && throwable.getMessage() != null) {
+            if (throwable != null) {
                 throw new IllegalStateException("Failed to calculate diff", throwable);
             }
 
             if (rxDiffResult == null) {
-                throw new IllegalStateException("rxDiffResult must not be null if the throwable is null too");
+                throw new IllegalStateException("rxDiffResult must not be null");
             }
 
             final DiffResultReceiver diffResultReceiver = mDiffResultReceiverWeakRef.get();
@@ -363,3 +363,4 @@ public final class DiffRequestManager<D, A extends RecyclerView.Adapter & Swappa
         }
     }
 }
+
