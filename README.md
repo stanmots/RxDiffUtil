@@ -1,3 +1,7 @@
+
+Warning: No Longer Maintained. 
+=====
+
 RxDiffUtil
 =====
 
